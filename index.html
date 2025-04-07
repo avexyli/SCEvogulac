@@ -60,16 +60,14 @@
       transform: translateX(-50%);
       opacity: 0;
       white-space: normal;
-      max-width: 460px;
-      max-height: 200px;
-      overflow: hidden;
-      mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
-      -webkit-mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
-      
+      width: max-content;
+      max-width: 480px;
       font-size: 0.85rem;
       font-weight: normal;
       transition: opacity 0.3s ease-in;
       line-height: 1.4;
+      box-sizing: border-box;
+      word-break: break-word;
     }
 
     .tooltip:hover .tooltip-bubble {
