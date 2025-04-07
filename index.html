@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SC: Evo Ladder</title>
+  <link rel="icon" type="image/png" href="Assets/icons/favicon.png" />
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -13,70 +14,54 @@
       margin: 0;
       padding: 2rem;
     }
-    h1 {
-      text-align: center;
-      margin-bottom: 1rem;
-    }
+
     .table-wrapper {
       max-width: 960px;
       margin: 0 auto;
       border-radius: 12px;
       overflow: hidden;
-      box-shadow: 0 0 15px rgba(0,0,0,0.25);
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.25);
     }
+
     table {
       border-collapse: collapse;
       width: 100%;
     }
+
     th, td {
       border: 1px solid #444;
       padding: 0.75rem;
       text-align: center;
       color: white;
     }
+
     th {
       background-color: #2d2d2d;
-      color: white;
     }
-    .rank-S td:last-child {
-      background: linear-gradient(to bottom, #65e2f5 15%, rgba(0, 0, 0, 0) 85%);
-    }
-    .rank-A td:last-child {
-      background: linear-gradient(to bottom, #28d6f0 15%, rgba(0, 0, 0, 0) 85%);
-    }
-    .rank-B td:last-child {
-      background: linear-gradient(to bottom, #2881f0 15%, rgba(0, 0, 0, 0) 85%);
-    }
-    .rank-C td:last-child {
-      background: linear-gradient(to bottom, #eef028 15%, rgba(0, 0, 0, 0) 85%);
-    }
-    .rank-D td:last-child {
-      background: linear-gradient(to bottom, #28f099 15%, rgba(0, 0, 0, 0) 85%);
-    }
-    .rank-F td:last-child {
-      background: linear-gradient(to bottom, #5cf028 15%, rgba(0, 0, 0, 0) 85%);
-    }
+
     .race-icon {
       height: 20px;
       vertical-align: middle;
       margin: 0 4px;
+      transition: transform 0.2s ease;
     }
-      .header-image img {
-      width: 100%;
-      max-height: 400px;
-      object-fit: cover;
-      display: block;
+
+    .race-icon:hover {
+      transform: scale(1.15);
     }
+
     .title-image {
       text-align: center;
       margin: 1.5rem 0;
     }
+
     .title-img {
       max-width: 600px;
       width: 100%;
       height: auto;
     }
-      .fade-in-top {
+
+    .fade-in-top {
       opacity: 0;
       transform: translateY(-30px);
       animation: fadeInTop 1s ease-out forwards;
@@ -102,10 +87,28 @@
         transform: translateY(0);
       }
     }
+
+    .rank-S td:last-child {
+      background: linear-gradient(to bottom, #65e2f5 15%, rgba(0, 0, 0, 0) 85%);
+    }
+    .rank-A td:last-child {
+      background: linear-gradient(to bottom, #28d6f0 15%, rgba(0, 0, 0, 0) 85%);
+    }
+    .rank-B td:last-child {
+      background: linear-gradient(to bottom, #2881f0 15%, rgba(0, 0, 0, 0) 85%);
+    }
+    .rank-C td:last-child {
+      background: linear-gradient(to bottom, #eef028 15%, rgba(0, 0, 0, 0) 85%);
+    }
+    .rank-D td:last-child {
+      background: linear-gradient(to bottom, #28f099 15%, rgba(0, 0, 0, 0) 85%);
+    }
+    .rank-F td:last-child {
+      background: linear-gradient(to bottom, #5cf028 15%, rgba(0, 0, 0, 0) 85%);
+    }
   </style>
 </head>
 <body>
-  
   <div class="title-image fade-in-top">
     <img src="Assets/titles/title_a.png" alt="SC: Evo Title" class="title-img" />
   </div>
@@ -134,7 +137,16 @@
       return races.map(r => {
         if (knownRaces.includes(r)) {
           const clean = r.replace(' ', '_');
-          return `<img class="race-icon" src="${iconBasePath}${clean}_Small.png" alt="${r}" />`;
+          const labelMap = {
+            'BW Terran': 'Brood War Terran',
+            'BW Zerg': 'Brood War Zerg',
+            'BW Protoss': 'Brood War Protoss',
+            'SC2 Terran': 'StarCraft 2 Terran',
+            'SC2 Zerg': 'StarCraft 2 Zerg',
+            'SC2 Protoss': 'StarCraft 2 Protoss'
+          };
+          const label = labelMap[r] || r;
+          return `<img class="race-icon" src="${iconBasePath}${clean}_Small.png" alt="${label}" title="${label}" />`;
         } else {
           return r;
         }
@@ -150,7 +162,18 @@
         const thead = document.querySelector('#leaderboard thead');
         const tbody = document.querySelector('#leaderboard tbody');
 
-        thead.innerHTML = `<tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr>`;
+        const tooltipMap = {
+          'Race': "Players in StarCraft: Evolution Complete compete with both factions in StarCraft: Brood War as well as StarCraft 2, and both of their preferred choices are reflected here in the table below. If Unknown is displayed, the Player may not have enough games with a chosen pair.",
+          'Rating': "Evogulac uses the Glicko-2 Rating System and aims to pay homage to Aligulac from StarCraft 2, all players begin at 1500 and gain and lose points accordingly. The higher, the stronger the player.",
+          'RD': "Rating Deviation, the system's measurement of certainty. The lower the deviation, the more stable.",
+          'Volatility': "Volatility is the measurement of how much a player's rating tends to swing, it begins at .06 at the beginning of the system and shifts over time.",
+          'Rank': "Evogulac uses the system similar to ICcup and Fish from Brood War's Ladder clients, a taste for our upcoming Ladder system. You'll have to compete to see what leads to where!"
+        };
+
+        thead.innerHTML = `<tr>${headers.map(h => {
+          const tooltip = tooltipMap[h] ? ` title="${tooltipMap[h]}"` : '';
+          return `<th${tooltip}>${h}</th>`;
+        }).join('')}</tr>`;
 
         data.forEach(row => {
           const rankClass = 'rank-' + row[5];
