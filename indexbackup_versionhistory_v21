@@ -135,13 +135,7 @@
     .rank-Fm td:last-child { background: linear-gradient(to bottom, #800000 15%, rgba(0, 0, 0, 0) 85%); }
 
     
-      .glow-terran { text-shadow: 0 0 6px rgba(100, 170, 255, 0.6); }
-    .glow-zerg { text-shadow: 0 0 6px rgba(255, 100, 100, 0.6); }
-    .glow-protoss { text-shadow: 0 0 6px rgba(100, 255, 170, 0.6); }
-    .glow-random { text-shadow: 0 0 6px rgba(255, 255, 100, 0.6); }
-    .glow-unknown { text-shadow: 0 0 6px rgba(0, 0, 0, 0.4); }
-
-</style>
+  </style>
 </head>
 <body>
   <div class="title-image fade-in-top">
@@ -219,19 +213,6 @@
           tr.innerHTML = row.map((cell, i) => {
             const isVolatility = headers[i]?.trim().toLowerCase() === 'volatility';
             const paddingStyle = isVolatility ? 'padding-left: 0.25rem; padding-right: 0.25rem;' : '';
-
-            // Apply glow to player name (index 0)
-            if (i === 0) {
-              const race = row[1];
-              let glowClass = 'glow-unknown';
-              if (race.includes('Terran')) glowClass = 'glow-terran';
-              else if (race.includes('Zerg')) glowClass = 'glow-zerg';
-              else if (race.includes('Protoss')) glowClass = 'glow-protoss';
-              else if (race === 'Random') glowClass = 'glow-random';
-              else if (race === 'Unknown') glowClass = 'glow-unknown';
-              return `<td class="${glowClass}" style="${paddingStyle}">${cell}</td>`;
-            }
-
             if (i === 1) {
               return `<td>${createRaceIcons(cell)}</td>`;
             }
