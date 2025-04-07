@@ -3,56 +3,77 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Rating System</title>
+  <title>StarCraft: Evolution Complete Evogulac</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background-color: #f4f4f9;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
-    .container {
-      text-align: center;
-      background-color: #fff;
-      padding: 40px;
-      border-radius: 8px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      font-family: sans-serif;
+      background-color: #f0f2f5;
+      color: #222;
+      margin: 2rem;
     }
     h1 {
-      color: #333;
+      text-align: center;
+      margin-bottom: 1rem;
     }
-    .rating {
-      font-size: 1.5em;
-      color: #555;
-      margin-top: 20px;
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      background-color: white;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 0.75rem;
+      text-align: left;
+    }
+    th {
+      background-color: #333;
+      color: white;
+    }
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+    .rank-S { background-color: #ffd700; }
+    .rank-A { background-color: #c6f6d5; }
+    .rank-B { background-color: #bee3f8; }
+    .rank-C { background-color: #fefcbf; }
+    .rank-D { background-color: #fed7d7; }
+    .rank-F { background-color: #e2e8f0; }
   </style>
 </head>
 <body>
-  <div class="container">
-    
-    <iframe
-    src="https://docs.google.com/spreadsheets/d/e/2PACX-1vSy8FqFeV1ehxYkcARDbImfb3UEPX9tnFodJk5q4bntnlg_nxHRMSLkhK1R5cedyE_qQt3j_hnM9bq8/pubhtml?gid=172854205&single=true&widget=true&headers=false"
-    width="100%"
-    height="600"
-    frameborder="0">
-  </iframe>
-
-
-    </iframe>
-
-
-
-
-  </div>
+  <h1>StarCraft: Evolution Complete Evogulac</h1>
+  <table id="leaderboard">
+    <thead></thead>
+    <tbody></tbody>
+  </table>
 
   <script>
-    // Placeholder for integrating the rating system dynamically
-    document.getElementById("rating").innerText = "Current Rating: 1500";
+    const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSy8FqFeV1ehxYkcARDbImfb3UEPX9tnFodJk5q4bntnlg_nxHRMSLkhK1R5cedyE_qQt3j_hnM9bq8/pub?gid=172854205&single=true&output=csv';
+
+    fetch(CSV_URL)
+      .then(res => res.text())
+      .then(csv => {
+        const rows = csv.trim().split('\n').map(row => row.split(','));
+        const [headers, ...data] = rows;
+
+        const thead = document.querySelector('#leaderboard thead');
+        const tbody = document.querySelector('#leaderboard tbody');
+
+        thead.innerHTML = `<tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr>`;
+
+        data.forEach(row => {
+          const rankClass = 'rank-' + row[5];
+          const tr = document.createElement('tr');
+          tr.className = rankClass;
+          tr.innerHTML = row.map(cell => `<td>${cell}</td>`).join('');
+          tbody.appendChild(tr);
+        });
+      })
+      .catch(err => {
+        document.querySelector('#leaderboard tbody').innerHTML = '<tr><td colspan="6">Failed to load data.</td></tr>';
+        console.error('Failed to load CSV:', err);
+      });
   </script>
 </body>
 </html>
