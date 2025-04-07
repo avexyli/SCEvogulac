@@ -55,14 +55,18 @@
       border-radius: 6px;
       position: absolute;
       z-index: 2000;
-      top: 100%;
+      bottom: 100%;
       left: 50%;
       transform: translateX(-50%);
       opacity: 0;
       white-space: normal;
-      max-width: 400px;
+      max-width: 460px;
+      max-height: 240px;
+      overflow-y: auto;
+      font-size: 0.85rem;
+      font-weight: normal;
       transition: opacity 0.3s ease-in;
-      line-height: 1.5;
+      line-height: 1.4;
     }
 
     .tooltip:hover .tooltip-bubble {
