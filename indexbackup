@@ -6,66 +6,44 @@
   <title>SC: Evo Ladder</title>
   <style>
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(to bottom, #223e4b, #0e1415);
-      color: #fff;
-      margin: 0;
-      padding: 2rem;
+      font-family: sans-serif;
+      background-color: #f0f2f5;
+      color: #222;
+      margin: 2rem;
     }
     h1 {
       text-align: center;
       margin-bottom: 1rem;
     }
-    .table-wrapper {
-      max-width: 960px;
-      margin: 0 auto;
-      border-radius: 12px;
-      overflow: hidden;
-      box-shadow: 0 0 15px rgba(0,0,0,0.25);
-    }
     table {
       border-collapse: collapse;
       width: 100%;
-      background-color: #1c1c1e;
+      background-color: white;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
     th, td {
-      border: 1px solid #444;
+      border: 1px solid #ddd;
       padding: 0.75rem;
       text-align: left;
-      color: white;
     }
     th {
-      background-color: #2d2d2d;
+      background-color: #333;
       color: white;
     }
-    .rank-S {
-      background: linear-gradient(to bottom, #ffd700, rgba(255, 215, 0, 0));
-    }
-    .rank-A {
-      background: linear-gradient(to bottom, #c6f6d5, rgba(198, 246, 213, 0));
-    }
-    .rank-B {
-      background: linear-gradient(to bottom, #bee3f8, rgba(190, 227, 248, 0));
-    }
-    .rank-C {
-      background: linear-gradient(to bottom, #fefcbf, rgba(254, 252, 191, 0));
-    }
-    .rank-D {
-      background: linear-gradient(to bottom, #fed7d7, rgba(254, 215, 215, 0));
-    }
-    .rank-F {
-      background: linear-gradient(to bottom, #e2e8f0, rgba(226, 232, 240, 0));
-    }
+    .rank-S { background-color: #ffd700; }
+    .rank-A { background-color: #c6f6d5; }
+    .rank-B { background-color: #bee3f8; }
+    .rank-C { background-color: #fefcbf; }
+    .rank-D { background-color: #fed7d7; }
+    .rank-F { background-color: #e2e8f0; }
   </style>
 </head>
 <body>
   <h1>SC: Evo Ladder</h1>
-  <div class="table-wrapper">
-    <table id="leaderboard">
-      <thead></thead>
-      <tbody></tbody>
-    </table>
-  </div>
+  <table id="leaderboard">
+    <thead></thead>
+    <tbody></tbody>
+  </table>
 
   <script>
     const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSy8FqFeV1ehxYkcARDbImfb3UEPX9tnFodJk5q4bntnlg_nxHRMSLkhK1R5cedyE_qQt3j_hnM9bq8/pub?gid=172854205&single=true&output=csv';
