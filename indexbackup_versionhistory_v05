@@ -37,35 +37,6 @@
 
     th {
       background-color: #2d2d2d;
-      position: relative;
-    }
-
-    .tooltip {
-      position: relative;
-      display: inline-block;
-      cursor: help;
-    }
-
-    .tooltip .tooltip-bubble {
-      visibility: hidden;
-      background-color: #333;
-      color: #fff;
-      text-align: center;
-      padding: 6px 10px;
-      border-radius: 6px;
-      position: absolute;
-      z-index: 1;
-      bottom: 125%;
-      left: 50%;
-      transform: translateX(-50%);
-      opacity: 0;
-      white-space: nowrap;
-      transition: opacity 0.3s;
-    }
-
-    .tooltip:hover .tooltip-bubble {
-      visibility: visible;
-      opacity: 1;
     }
 
     .race-icon {
@@ -117,12 +88,24 @@
       }
     }
 
-    .rank-S td:last-child { background: linear-gradient(to bottom, #65e2f5 15%, rgba(0, 0, 0, 0) 85%); }
-    .rank-A td:last-child { background: linear-gradient(to bottom, #28d6f0 15%, rgba(0, 0, 0, 0) 85%); }
-    .rank-B td:last-child { background: linear-gradient(to bottom, #2881f0 15%, rgba(0, 0, 0, 0) 85%); }
-    .rank-C td:last-child { background: linear-gradient(to bottom, #eef028 15%, rgba(0, 0, 0, 0) 85%); }
-    .rank-D td:last-child { background: linear-gradient(to bottom, #28f099 15%, rgba(0, 0, 0, 0) 85%); }
-    .rank-F td:last-child { background: linear-gradient(to bottom, #5cf028 15%, rgba(0, 0, 0, 0) 85%); }
+    .rank-S td:last-child {
+      background: linear-gradient(to bottom, #65e2f5 15%, rgba(0, 0, 0, 0) 85%);
+    }
+    .rank-A td:last-child {
+      background: linear-gradient(to bottom, #28d6f0 15%, rgba(0, 0, 0, 0) 85%);
+    }
+    .rank-B td:last-child {
+      background: linear-gradient(to bottom, #2881f0 15%, rgba(0, 0, 0, 0) 85%);
+    }
+    .rank-C td:last-child {
+      background: linear-gradient(to bottom, #eef028 15%, rgba(0, 0, 0, 0) 85%);
+    }
+    .rank-D td:last-child {
+      background: linear-gradient(to bottom, #28f099 15%, rgba(0, 0, 0, 0) 85%);
+    }
+    .rank-F td:last-child {
+      background: linear-gradient(to bottom, #5cf028 15%, rgba(0, 0, 0, 0) 85%);
+    }
   </style>
 </head>
 <body>
@@ -188,10 +171,8 @@
         };
 
         thead.innerHTML = `<tr>${headers.map(h => {
-          if (tooltipMap[h]) {
-            return `<th><div class="tooltip">${h}<div class="tooltip-bubble">${tooltipMap[h]}</div></div></th>`;
-          }
-          return `<th>${h}</th>`;
+          const tooltip = tooltipMap[h] ? ` title="${tooltipMap[h]}"` : '';
+          return `<th${tooltip}>${h}</th>`;
         }).join('')}</tr>`;
 
         data.forEach(row => {
