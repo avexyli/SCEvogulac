@@ -29,8 +29,6 @@
     }
 
     th, td {
-      padding-left: 0.75rem;
-      padding-right: 0.75rem;
       border: 1px solid #444;
       padding: 0.75rem;
       text-align: center;
@@ -209,12 +207,10 @@
           const tr = document.createElement('tr');
           tr.className = rankClass;
           tr.innerHTML = row.map((cell, i) => {
-            const isVolatility = headers[i]?.trim().toLowerCase() === 'volatility';
-            const paddingStyle = isVolatility ? 'padding-left: 0.25rem; padding-right: 0.25rem;' : '';
             if (i === 1) {
               return `<td>${createRaceIcons(cell)}</td>`;
             }
-            return `<td style="${paddingStyle}">${cell}</td>`;
+            return `<td>${cell}</td>`;
           }).join('');
           tbody.appendChild(tr);
         });
