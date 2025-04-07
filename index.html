@@ -16,33 +16,26 @@
       margin-bottom: 1rem;
     }
     table {
-  border-collapse: collapse;
-  width: 100%;
-  table-layout: fixed;
-  background-color: white;
-  box-shadow: 0 0 10px rgba(0,0,0,0.1);
-  border: 1px solid #ddd;
-}
+      border-collapse: collapse;
+      width: 100%;
+      background-color: white;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 0.75rem;
+      text-align: left;
+    }
     th {
-  background-color: #333;
-  color: white;
-  border: 1px solid #ddd;
-  padding: 0.75rem;
-  text-align: left;
-}
+      background-color: #333;
+      color: white;
+    }
     .rank-S { background-color: #ffd700; }
     .rank-A { background-color: #c6f6d5; }
     .rank-B { background-color: #bee3f8; }
     .rank-C { background-color: #fefcbf; }
     .rank-D { background-color: #fed7d7; }
     .rank-F { background-color: #e2e8f0; }
-
-    th:nth-child(1), td:nth-child(1) { width: 160px; } /* Player */
-    th:nth-child(2), td:nth-child(2) { width: 200px; } /* Race */
-    th:nth-child(3), td:nth-child(3) { width: 80px; }  /* Rating */
-    th:nth-child(4), td:nth-child(4) { width: 60px; }  /* RD */
-    th:nth-child(5), td:nth-child(5) { width: 100px; } /* Volatility */
-    th:nth-child(6), td:nth-child(6) { width: 50px; }  /* Rank */
   </style>
 </head>
 <body>
