@@ -19,7 +19,6 @@
       max-width: 960px;
       margin: 0 auto;
       border-radius: 12px;
-      
       box-shadow: 0 0 15px rgba(0, 0, 0, 0.25);
     }
 
@@ -133,7 +132,14 @@
     .rank-D td:last-child { background: linear-gradient(to bottom, #28f099 15%, rgba(0, 0, 0, 0) 85%); }
     .rank-E td:last-child { background: linear-gradient(to bottom, #5cf028 15%, rgba(0, 0, 0, 0) 85%); }
     .rank-F td:last-child { background: linear-gradient(to bottom, #f02828 15%, rgba(0, 0, 0, 0) 85%); }
-    .rank-F td:last-child { background: linear-gradient(to bottom, #800000 15%, rgba(0, 0, 0, 0) 85%); }
+    .rank-Fm td:last-child { background: linear-gradient(to bottom, #800000 15%, rgba(0, 0, 0, 0) 85%); }
+
+    /* Underglow based on Race */
+    .race-underglow-terran { text-shadow: 0 0 6px rgba(100, 170, 255, 0.6); }
+    .race-underglow-zerg { text-shadow: 0 0 6px rgba(255, 100, 100, 0.6); }
+    .race-underglow-protoss { text-shadow: 0 0 6px rgba(100, 255, 170, 0.6); }
+    .race-underglow-random { text-shadow: 0 0 6px rgba(255, 255, 100, 0.6); }
+    .race-underglow-unknown { text-shadow: 0 0 6px rgba(0, 0, 0, 0.4); }
   </style>
 </head>
 <body>
@@ -146,85 +152,5 @@
       <tbody></tbody>
     </table>
   </div>
-
-  <script>
-    const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSy8FqFeV1ehxYkcARDbImfb3UEPX9tnFodJk5q4bntnlg_nxHRMSLkhK1R5cedyE_qQt3j_hnM9bq8/pub?gid=172854205&single=true&output=csv';
-
-    function createRaceIcons(raceValue) {
-      const iconBasePath = 'Assets/icons/';
-      const knownRaces = [
-        'BW Terran', 'BW Zerg', 'BW Protoss',
-        'SC2 Terran', 'SC2 Zerg', 'SC2 Protoss'
-      ];
-
-      if (raceValue === 'Random' || raceValue === 'Unknown') {
-        return raceValue;
-      }
-
-      const races = raceValue.split(' / ');
-      return races.map(r => {
-        if (knownRaces.includes(r)) {
-          const clean = r.replace(' ', '_');
-          const labelMap = {
-            'BW Terran': 'Brood War Terran',
-            'BW Zerg': 'Brood War Zerg',
-            'BW Protoss': 'Brood War Protoss',
-            'SC2 Terran': 'StarCraft 2 Terran',
-            'SC2 Zerg': 'StarCraft 2 Zerg',
-            'SC2 Protoss': 'StarCraft 2 Protoss'
-          };
-          const label = labelMap[r] || r;
-          return `<img class="race-icon" src="${iconBasePath}${clean}_Small.png" alt="${label}" title="${label}" />`;
-        } else {
-          return r;
-        }
-      }).join('');
-    }
-
-    fetch(CSV_URL)
-      .then(res => res.text())
-      .then(csv => {
-        const rows = csv.trim().split('\n').map(row => row.split(','));
-        const [headers, ...data] = rows;
-
-        const thead = document.querySelector('#leaderboard thead');
-        const tbody = document.querySelector('#leaderboard tbody');
-
-        const tooltipMap = {
-          'Race': "Players in StarCraft: Evolution Complete compete with both factions in StarCraft: Brood War as well as StarCraft 2, and both of their preferred choices are reflected here in the table below. If Unknown is displayed, the Player may not have enough games with a chosen pair.",
-          'Rating': "Evogulac uses the Glicko-2 Rating System and aims to pay homage to Aligulac from StarCraft 2, all players begin at 1500 and gain and lose points accordingly. The higher, the stronger the player.",
-          'RD': "Rating Deviation, the system's measurement of certainty. The lower the deviation, the more stable.",
-          'Volatility': "Volatility is the measurement of how much a player's rating tends to swing, it begins at .06 at the beginning of the system and shifts over time.",
-          'Rank': "Evogulac uses the system similar to ICcup and Fish from Brood War's Ladder clients, a taste for our upcoming Ladder system. You'll have to compete to see what leads to where!"
-        };
-
-        thead.innerHTML = `<tr>${headers.map(h => {
-  const cleanHeader = h.trim();
-  if (tooltipMap[cleanHeader]) {
-    return `<th><div class="tooltip">${cleanHeader}<div class="tooltip-bubble">${tooltipMap[cleanHeader]}</div></div></th>`;
-  }
-  return `<th>${cleanHeader}</th>`;
-}).join('')}</tr>`;
-
-        data.forEach(row => {
-          const rankClass = 'rank-' + row[5];
-          const tr = document.createElement('tr');
-          tr.className = rankClass;
-          tr.innerHTML = row.map((cell, i) => {
-            const isVolatility = headers[i]?.trim().toLowerCase() === 'volatility';
-            const paddingStyle = isVolatility ? 'padding-left: 0.25rem; padding-right: 0.25rem;' : '';
-            if (i === 1) {
-              return `<td>${createRaceIcons(cell)}</td>`;
-            }
-            return `<td style="${paddingStyle}">${cell}</td>`;
-          }).join('');
-          tbody.appendChild(tr);
-        });
-      })
-      .catch(err => {
-        document.querySelector('#leaderboard tbody').innerHTML = '<tr><td colspan="6">Failed to load data.</td></tr>';
-        console.error('Failed to load CSV:', err);
-      });
-  </script>
 </body>
 </html>
