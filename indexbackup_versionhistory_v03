@@ -8,9 +8,10 @@
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background: linear-gradient(to bottom, #223e4b, #0e1415);
-      background-attachment: fixed;
-      background-size: cover;
-      background-repeat: no-repeat;}
+      color: #fff;
+      margin: 0;
+      padding: 2rem;
+    }
     h1 {
       text-align: center;
       margin-bottom: 1rem;
@@ -59,30 +60,10 @@
       vertical-align: middle;
       margin: 0 4px;
     }
-      .header-image img {
-      width: 100%;
-      max-height: 400px;
-      object-fit: cover;
-      display: block;
-    }
-    .title-image {
-      text-align: center;
-      margin: 1.5rem 0;
-    }
-    .title-img {
-      max-width: 600px;
-      width: 100%;
-      height: auto;
-    }
   </style>
 </head>
 <body>
-  <div class="header-image">
-    <img src="Assets/background/planet_header.png" alt="Header Background" class="header-bg" />
-  </div>
-  <div class="title-image">
-    <img src="Assets/titles/title_a.png" alt="SC: Evo Title" class="title-img" />
-  </div>
+  <h1>SC: Evo Ladder</h1>
   <div class="table-wrapper">
     <table id="leaderboard">
       <thead></thead>
