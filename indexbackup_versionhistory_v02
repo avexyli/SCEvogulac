@@ -30,36 +30,31 @@
     th, td {
       border: 1px solid #444;
       padding: 0.75rem;
-      text-align: center;
+      text-align: left;
       color: white;
     }
     th {
       background-color: #2d2d2d;
       color: white;
     }
-    .rank-S td:last-child {
-      background: linear-gradient(to bottom, #65e2f5 15%, rgba(0, 0, 0, 0) 85%);
-    }
-    .rank-A td:last-child {
-      background: linear-gradient(to bottom, #28d6f0 15%, rgba(0, 0, 0, 0) 85%);
-    }
-    .rank-B td:last-child {
-      background: linear-gradient(to bottom, #2881f0 15%, rgba(0, 0, 0, 0) 85%);
-    }
-    .rank-C td:last-child {
-      background: linear-gradient(to bottom, #eef028 15%, rgba(0, 0, 0, 0) 85%);
-    }
-    .rank-D td:last-child {
-      background: linear-gradient(to bottom, #28f099 15%, rgba(0, 0, 0, 0) 85%);
-    }
-    .rank-F td:last-child {
-      background: linear-gradient(to bottom, #5cf028 15%, rgba(0, 0, 0, 0) 85%);
-    }
-    .race-icon {
-      height: 20px;
-      vertical-align: middle;
-      margin: 0 4px;
-    }
+    .rank-S {
+  background: linear-gradient(to bottom, #ffd700, rgba(0, 0, 0, 0));
+}
+    .rank-A {
+  background: linear-gradient(to bottom, #c6f6d5, rgba(0, 0, 0, 0));
+}
+    .rank-B {
+  background: linear-gradient(to bottom, #bee3f8, rgba(0, 0, 0, 0));
+}
+    .rank-C {
+  background: linear-gradient(to bottom, #fefcbf, rgba(0, 0, 0, 0));
+}
+    .rank-D {
+  background: linear-gradient(to bottom, #fed7d7, rgba(0, 0, 0, 0));
+}
+    .rank-F {
+  background: linear-gradient(to bottom, #e2e8f0, rgba(0, 0, 0, 0));
+}
   </style>
 </head>
 <body>
@@ -73,28 +68,6 @@
 
   <script>
     const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSy8FqFeV1ehxYkcARDbImfb3UEPX9tnFodJk5q4bntnlg_nxHRMSLkhK1R5cedyE_qQt3j_hnM9bq8/pub?gid=172854205&single=true&output=csv';
-
-    function createRaceIcons(raceValue) {
-      const iconBasePath = 'Assets/icons/';
-      const knownRaces = [
-        'BW Terran', 'BW Zerg', 'BW Protoss',
-        'SC2 Terran', 'SC2 Zerg', 'SC2 Protoss'
-      ];
-
-      if (raceValue === 'Random' || raceValue === 'Unknown') {
-        return raceValue;
-      }
-
-      const races = raceValue.split(' / ');
-      return races.map(r => {
-        if (knownRaces.includes(r)) {
-          const clean = r.replace(' ', '_');
-          return `<img class="race-icon" src="${iconBasePath}${clean}_Small.png" alt="${r}" />`;
-        } else {
-          return r;
-        }
-      }).join('');
-    }
 
     fetch(CSV_URL)
       .then(res => res.text())
@@ -111,12 +84,7 @@
           const rankClass = 'rank-' + row[5];
           const tr = document.createElement('tr');
           tr.className = rankClass;
-          tr.innerHTML = row.map((cell, i) => {
-            if (i === 1) {
-              return `<td>${createRaceIcons(cell)}</td>`;
-            }
-            return `<td>${cell}</td>`;
-          }).join('');
+          tr.innerHTML = row.map(cell => `<td>${cell}</td>`).join('');
           tbody.appendChild(tr);
         });
       })
