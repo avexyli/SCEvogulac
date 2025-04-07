@@ -195,11 +195,12 @@
         };
 
         thead.innerHTML = `<tr>${headers.map(h => {
-          if (tooltipMap[h]) {
-            return `<th><div class="tooltip">${h}<div class="tooltip-bubble">${tooltipMap[h]}</div></div></th>`;
-          }
-          return `<th>${h}</th>`;
-        }).join('')}</tr>`;
+  const cleanHeader = h.trim();
+  if (tooltipMap[cleanHeader]) {
+    return `<th><div class="tooltip">${cleanHeader}<div class="tooltip-bubble">${tooltipMap[cleanHeader]}</div></div></th>`;
+  }
+  return `<th>${cleanHeader}</th>`;
+}).join('')}</tr>`;
 
         data.forEach(row => {
           const rankClass = 'rank-' + row[5];
