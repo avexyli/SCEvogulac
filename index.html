@@ -404,7 +404,8 @@
               return `<td class="inactive-risk-hidden"></td>`;
             }
 
-            return `<td style="${paddingStyle}">${cell}</td>`;
+            /*return `<td style="${paddingStyle}">${cell}</td>`;*/
+            return `<td style="${paddingStyle}" data-final="${cell}"></td>`;
           }).join('');
           tbody.appendChild(tr);
 
