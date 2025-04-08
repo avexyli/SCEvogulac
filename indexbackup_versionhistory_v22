@@ -188,6 +188,7 @@
     fetch(CSV_URL)
       .then(res => res.text())
       .then(csv => {
+        //problematic line
         const rows = csv.trim().split('\n').map(row => row.split(','));
         const [headers, ...data] = rows;
 
@@ -210,12 +211,7 @@
           return `<th>${cleanHeader}</th>`;
         }).join('')}</tr>`;
 
-        const rdIndex = headers.findIndex(h => h.trim().toLowerCase() === 'rd');
-
         data.forEach(row => {
-          const rdValue = parseFloat(row[rdIndex]);
-          if (isNaN(rdValue) || rdValue > 220) return;
-
           const rankClass = 'rank-' + row[5];
           const tr = document.createElement('tr');
           tr.className = rankClass;
@@ -223,6 +219,7 @@
             const isVolatility = headers[i]?.trim().toLowerCase() === 'volatility';
             const paddingStyle = isVolatility ? 'padding-left: 0.25rem; padding-right: 0.25rem;' : '';
 
+            // Apply glow to player name (index 0)
             if (i === 0) {
               const race = row[1];
               let glowClass = 'glow-unknown';
@@ -237,7 +234,6 @@
             if (i === 1) {
               return `<td>${createRaceIcons(cell)}</td>`;
             }
-
             return `<td style="${paddingStyle}">${cell}</td>`;
           }).join('');
           tbody.appendChild(tr);
@@ -247,6 +243,6 @@
         document.querySelector('#leaderboard tbody').innerHTML = '<tr><td colspan="6">Failed to load data.</td></tr>';
         console.error('Failed to load CSV:', err);
       });
-</script>
+  </script>
 </body>
 </html>
