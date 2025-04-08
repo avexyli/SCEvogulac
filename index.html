@@ -254,7 +254,13 @@
     fetch(CSV_URL)
       .then(res => res.text())
       .then(csv => {
-        const rows = csv.trim().split('\n').map(row => row.split(','));
+        /*const rows = csv.trim().split('\n').map(row => row.split(','));*/
+         const rows = csv
+         .trim()
+         .split('\n')
+         .map(row => row.split(','))
+         .filter(row => row.some(cell => cell.trim() !== ''));
+  
         const [headers, ...data] = rows;
 
         const thead = document.querySelector('#leaderboard thead');
