@@ -6,6 +6,7 @@
   <title>SC: Evo Ladder</title>
   <link rel="icon" type="image/png" href="Assets/icons/favicon.png" />
   <style>
+    /* === Page Layout === */
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background: url('Assets/background/planet_background.png') no-repeat center top scroll;
@@ -19,33 +20,47 @@
       max-width: 960px;
       margin: 0 auto;
       border-radius: 12px;
-      box-shadow: 0 0 15px rgba(0, 0, 0, 0.25);
     }
 
     table {
-      border-collapse: collapse;
+      border-collapse: separate;
+      border-spacing: 0;
       width: 100%;
+      table-layout: fixed;
     }
 
     th, td {
       padding-left: 0.75rem;
       padding-right: 0.75rem;
-      border: 1px solid #444;
       padding: 0.75rem;
       text-align: center;
       color: white;
+      word-wrap: break-word;
     }
 
     th {
       background-color: #2d2d2d;
       position: relative;
+      border: 1px solid #444;
     }
 
-    th:last-child, td:last-child {
-      border-right: none;
+    td {
+      border-left: 1px solid #444;
+      border-right: 1px solid #444;
+      border-bottom: 1px solid #444;
+    }
+
+    td:last-child {
+      border: none;
       box-shadow: none;
     }
 
+    th:last-child {
+      border: none;
+      box-shadow: none;
+    }
+
+    /* === Tooltip Styling === */
     .tooltip {
       position: relative;
       display: inline-block;
@@ -66,7 +81,7 @@
       transform: translateX(-50%);
       opacity: 0;
       white-space: normal;
-      width: max-content;
+      width: 280px;
       max-width: 480px;
       font-size: 0.85rem;
       font-weight: normal;
@@ -81,6 +96,7 @@
       opacity: 1;
     }
 
+    /* === Icons and Animations === */
     .race-icon {
       height: 20px;
       vertical-align: middle;
@@ -90,6 +106,11 @@
 
     .race-icon:hover {
       transform: scale(1.15);
+    }
+
+    .danger-icon, .question-icon {
+      height: 20px;
+      vertical-align: middle;
     }
 
     .title-image {
@@ -130,6 +151,7 @@
       }
     }
 
+    /* === Rank Color Gradients === */
     .rank-S td:nth-child(6) { background: linear-gradient(to bottom, #65e2f5 15%, rgba(0, 0, 0, 0) 85%); }
     .rank-A td:nth-child(6) { background: linear-gradient(to bottom, #28d6f0 15%, rgba(0, 0, 0, 0) 85%); }
     .rank-B td:nth-child(6) { background: linear-gradient(to bottom, #2881f0 15%, rgba(0, 0, 0, 0) 85%); }
@@ -139,39 +161,28 @@
     .rank-F td:nth-child(6) { background: linear-gradient(to bottom, #f02828 15%, rgba(0, 0, 0, 0) 85%); }
     .rank-Fm td:nth-child(6) { background: linear-gradient(to bottom, #800000 15%, rgba(0, 0, 0, 0) 85%); }
 
-    .inactive-risk-header {
-      width: 220px;
-      border-left: none;
-      box-shadow: none;
-    }
-
-    .inactive-risk-hidden {
-      width: 220px;
-      border-left: none;
-      box-shadow: none;
-    }
-
-    .inactive-risk-visible {
-      width: 220px;
-      border-left: none;
-      box-shadow: none;
-    }
-
-    .danger-icon {
-      height: 20px;
-      vertical-align: middle;
-    }
-
-    .question-icon {
-      height: 20px;
-      vertical-align: middle;
-    }
-
-    .glow-terran { text-shadow: 0 0 8px rgba(100, 170, 255, 1); }
-    .glow-zerg { text-shadow: 0 0 8px rgba(255, 100, 100, 1); }
-    .glow-protoss { text-shadow: 0 0 8px rgba(100, 255, 150, 1); }
-    .glow-random { text-shadow: 0 0 8px rgba(255, 255, 100, 1); }
+    /* === Player Name Glow === */
+    .glow-terran { text-shadow: 0 0 8px rgba(100, 170, 255, 0.8); }
+    .glow-zerg { text-shadow: 0 0 8px rgba(255, 100, 100, 0.8); }
+    .glow-protoss { text-shadow: 0 0 8px rgba(120, 255, 120, 0.8); }
+    .glow-random { text-shadow: 0 0 8px rgba(255, 255, 100, 0.8); }
     .glow-unknown { text-shadow: 0 0 8px rgba(0, 0, 0, 0.5); }
+
+    /* === InactiveRisk Visibility Control === */
+    td.inactive-risk-hidden {
+      visibility: hidden;
+      padding: 0 !important;
+      border: none !important;
+    }
+
+    td.inactive-risk-visible {
+      width: 130px;
+    }
+
+    th.inactive-risk-header {
+      border: none;
+      box-shadow: none;
+    }
   </style>
 </head>
 <body>
@@ -194,12 +205,9 @@
         'SC2 Terran', 'SC2 Zerg', 'SC2 Protoss'
       ];
 
-      if (raceValue === 'Random' || raceValue === 'Unknown') {
-        return raceValue;
-      }
+      if (raceValue === 'Random' || raceValue === 'Unknown') return raceValue;
 
-      const races = raceValue.split(' / ');
-      return races.map(r => {
+      return raceValue.split(' / ').map(r => {
         if (knownRaces.includes(r)) {
           const clean = r.replace(' ', '_');
           const labelMap = {
@@ -212,9 +220,8 @@
           };
           const label = labelMap[r] || r;
           return `<img class="race-icon" src="${iconBasePath}${clean}_Small.png" alt="${label}" title="${label}" />`;
-        } else {
-          return r;
         }
+        return r;
       }).join('');
     }
 
@@ -239,10 +246,7 @@
         thead.innerHTML = `<tr>${headers.map(h => {
           const cleanHeader = h.trim();
           if (cleanHeader === 'InactiveRisk') {
-            return `<th class="inactive-risk-header tooltip">
-              <img src="Assets/icons/question_mark.png" class="question-icon" alt="Inactive Risk" />
-              <div class="tooltip-bubble">${tooltipMap[cleanHeader]}</div>
-            </th>`;
+            return `<th class="inactive-risk-header tooltip"><img src="Assets/icons/question_mark.png" class="question-icon"><div class="tooltip-bubble">${tooltipMap[cleanHeader]}</div></th>`;
           }
           if (tooltipMap[cleanHeader]) {
             return `<th><div class="tooltip">${cleanHeader}<div class="tooltip-bubble">${tooltipMap[cleanHeader]}</div></div></th>`;
@@ -256,11 +260,9 @@
           const rankClass = 'rank-' + row[5];
           const tr = document.createElement('tr');
           tr.className = rankClass;
-          tr.innerHTML = row.map((cell, i) => {
-            const isVolatility = headers[i]?.trim().toLowerCase() === 'volatility';
-            const isInactiveRisk = headers[i]?.trim() === 'InactiveRisk';
-            const paddingStyle = isVolatility ? 'padding-left: 0.25rem; padding-right: 0.25rem;' : '';
 
+          tr.innerHTML = row.map((cell, i) => {
+            const header = headers[i].trim();
             if (i === 0) {
               const race = row[1];
               let glowClass = 'glow-unknown';
@@ -269,25 +271,21 @@
               else if (race.includes('Protoss')) glowClass = 'glow-protoss';
               else if (race === 'Random') glowClass = 'glow-random';
               else if (race === 'Unknown') glowClass = 'glow-unknown';
-              return `<td class="${glowClass}" style="${paddingStyle}">${cell}</td>`;
+              return `<td class="${glowClass}">${cell}</td>`;
             }
-
             if (i === 1) {
               return `<td>${createRaceIcons(cell)}</td>`;
             }
-
-            if (isInactiveRisk) {
+            if (header === 'InactiveRisk') {
               if (cell === '1') {
-                return `<td class="inactive-risk-visible tooltip">
-                  <img src="Assets/icons/danger_expire.png" class="danger-icon" alt="At Risk" />
-                  <div class="tooltip-bubble">This player is marked At Risk!</div>
-                </td>`;
+                return `<td class="inactive-risk-visible tooltip"><img src="Assets/icons/danger_expire.png" class="danger-icon"><div class="tooltip-bubble">This player is marked At Risk!</div></td>`;
+              } else {
+                return `<td class="inactive-risk-visible"><img src="Assets/icons/question_mark.png" class="question-icon"></td>`;
               }
-              return `<td class="inactive-risk-hidden"></td>`;
             }
-
-            return `<td style="${paddingStyle}">${cell}</td>`;
+            return `<td>${cell}</td>`;
           }).join('');
+
           tbody.appendChild(tr);
         });
       })
