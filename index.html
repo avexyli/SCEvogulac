@@ -463,6 +463,7 @@
               const originalText = td.getAttribute('data-final');
              /* if (td.querySelector('img')) return; */
              if (!originalText || td.querySelector('img')) return; // Skip icons or empty cells
+             td.setAttribute("title", originalText); // Add original username on hover
               scrambleText(td, originalText, 600);
             }); 
           }, 300); // Delay after fade-in
