@@ -15,6 +15,20 @@
       padding: 2rem;
     }
 
+    @font-face {
+      font-family: 'Orbitron';
+     src: url('Assets/fonts/orbitron-webfont.woff2') format('woff2');
+      font-weight: normal;
+      font-style: normal;
+    }
+
+    @font-face {
+      font-family: 'Blackpool';
+      src: url('Assets/fonts/Blackpool-webfont.woff2') format('woff2');
+      font-weight: normal;
+      font-style: normal;
+    }
+
     .table-wrapper {
       max-width: 960px;
       margin: 0 auto;
@@ -139,10 +153,20 @@
     .rank-F td:nth-child(6) { background: linear-gradient(to bottom, #f02828 15%, rgba(0, 0, 0, 0) 85%); }
     .rank-Fm td:nth-child(6) { background: linear-gradient(to bottom, #800000 15%, rgba(0, 0, 0, 0) 85%); }
 
+    #leaderboard td {
+  font-family: 'Orbitron', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
     .inactive-risk-header {
       width: 220px;
       border-left: none;
       box-shadow: none;
+    }
+
+    #leaderboard th {
+  font-family: 'Blackpool', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  letter-spacing: 0.5px; /* Optional flair */
+  font-size: 1rem;        /* Adjust for readability */
     }
 
     .inactive-risk-hidden {
