@@ -24,7 +24,8 @@
     }
 
     table {
-      border-collapse: collapse;
+      border-collapse: separate;
+      border-spacing: 0;
       width: 100%;
       table-layout: fixed;
     }
@@ -32,7 +33,6 @@
     th, td {
       padding-left: 0.75rem;
       padding-right: 0.75rem;
-      border: 1px solid #444;
       padding: 0.75rem;
       text-align: center;
       color: white;
@@ -42,6 +42,21 @@
     th {
       background-color: #2d2d2d;
       position: relative;
+      border: 1px solid #444;
+    }
+
+    td {
+      border-left: 1px solid #444;
+      border-right: 1px solid #444;
+      border-bottom: 1px solid #444;
+    }
+
+    td:last-child {
+      border: none;
+    }
+
+    th:last-child {
+      border: none;
     }
 
     /* === Tooltip Styling === */
@@ -92,7 +107,7 @@
       transform: scale(1.15);
     }
 
-    .danger-icon {
+    .danger-icon, .question-icon {
       height: 20px;
       vertical-align: middle;
     }
@@ -184,12 +199,9 @@
         'SC2 Terran', 'SC2 Zerg', 'SC2 Protoss'
       ];
 
-      if (raceValue === 'Random' || raceValue === 'Unknown') {
-        return raceValue;
-      }
+      if (raceValue === 'Random' || raceValue === 'Unknown') return raceValue;
 
-      const races = raceValue.split(' / ');
-      return races.map(r => {
+      return raceValue.split(' / ').map(r => {
         if (knownRaces.includes(r)) {
           const clean = r.replace(' ', '_');
           const labelMap = {
@@ -202,9 +214,8 @@
           };
           const label = labelMap[r] || r;
           return `<img class="race-icon" src="${iconBasePath}${clean}_Small.png" alt="${label}" title="${label}" />`;
-        } else {
-          return r;
         }
+        return r;
       }).join('');
     }
 
@@ -260,7 +271,7 @@
               if (cell === '1') {
                 return `<td class="inactive-risk-visible tooltip"><img src="Assets/icons/danger_expire.png" class="danger-icon"><div class="tooltip-bubble">This player is marked At Risk!</div></td>`;
               } else {
-                return `<td class="inactive-risk-hidden"></td>`;
+                return `<td class="inactive-risk-visible"><img src="Assets/icons/question_mark.png" class="question-icon"></td>`;
               }
             }
             return `<td>${cell}</td>`;
