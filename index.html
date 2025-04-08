@@ -410,12 +410,15 @@
           tbody.appendChild(tr);
 
           setTimeout(() => {
+
             const cells = tr.querySelectorAll('td');
             cells.forEach(td => {
-              const originalText = td.textContent;
-              if (td.querySelector('img')) return; // Skip icons
+             /* const originalText = td.textContent;*/
+              const originalText = td.getAttribute('data-final');
+             /* if (td.querySelector('img')) return; */
+             if (!originalText || td.querySelector('img')) return; // Skip icons or empty cells
               scrambleText(td, originalText, 600);
-            });
+            }); 
           }, 300); // Delay after fade-in
 
         });
