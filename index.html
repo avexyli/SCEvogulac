@@ -20,7 +20,6 @@
       max-width: 960px;
       margin: 0 auto;
       border-radius: 12px;
-      box-shadow: 0 0 15px rgba(0, 0, 0, 0.25);
     }
 
     table {
@@ -53,10 +52,12 @@
 
     td:last-child {
       border: none;
+      box-shadow: none;
     }
 
     th:last-child {
       border: none;
+      box-shadow: none;
     }
 
     /* === Tooltip Styling === */
@@ -177,6 +178,11 @@
     td.inactive-risk-visible {
       width: 130px;
     }
+
+    th.inactive-risk-header {
+      border: none;
+      box-shadow: none;
+    }
   </style>
 </head>
 <body>
@@ -239,6 +245,9 @@
 
         thead.innerHTML = `<tr>${headers.map(h => {
           const cleanHeader = h.trim();
+          if (cleanHeader === 'InactiveRisk') {
+            return `<th class="inactive-risk-header tooltip"><img src="Assets/icons/question_mark.png" class="question-icon"><div class="tooltip-bubble">${tooltipMap[cleanHeader]}</div></th>`;
+          }
           if (tooltipMap[cleanHeader]) {
             return `<th><div class="tooltip">${cleanHeader}<div class="tooltip-bubble">${tooltipMap[cleanHeader]}</div></div></th>`;
           }
