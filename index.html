@@ -249,6 +249,27 @@
         }
       }).join('');
     }
+          function scrambleText(element, finalText, duration = 800, charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789") {
+        const frameRate = 30;
+        const steps = Math.floor(duration / frameRate);
+        let currentStep = 0;
+
+        const scrambleInterval = setInterval(() => {
+          let display = '';
+          for (let i = 0; i < finalText.length; i++) {
+            if (currentStep < steps) {
+              display += charset[Math.floor(Math.random() * charset.length)];
+            } else {
+              display += finalText[i];
+            }
+          }
+
+          element.textContent = display;
+          currentStep++;
+
+          if (currentStep > steps) clearInterval(scrambleInterval);
+        }, frameRate);
+      }
 
     fetch(CSV_URL)
       .then(res => res.text())
@@ -327,6 +348,15 @@
             return `<td style="${paddingStyle}">${cell}</td>`;
           }).join('');
           tbody.appendChild(tr);
+
+          setTimeout(() => {
+            const cells = tr.querySelectorAll('td');
+            cells.forEach(td => {
+            const originalText = td.textContent;
+              if (td.querySelector('img')) return; // Skip icons
+                scrambleText(td, originalText, 600);
+            });
+          }, 300); // Delay after fade-in
         });
       })
       .catch(err => {
