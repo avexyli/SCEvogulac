@@ -196,8 +196,7 @@ function createRaceIcons(raceValue) {
 fetch(CSV_URL)
   .then(res => res.text())
   .then(csv => {
-    const rows = csv.trim().split('
-').map(row => row.split(','));
+    const rows = csv.trim().split('\n').map(row => row.split(','));
     const [headers, ...data] = rows;
 
     const thead = document.querySelector('#leaderboard thead');
@@ -208,7 +207,8 @@ fetch(CSV_URL)
       'Rating': "Evogulac uses the Glicko-2 Rating System and aims to pay homage to Aligulac from StarCraft 2, all players begin at 1500 and gain and lose points accordingly. The higher, the stronger the player.",
       'RD': "Rating Deviation, the system's measurement of certainty. The lower the deviation, the more stable.",
       'Volatility': "Volatility is the measurement of how much a player's rating tends to swing, it begins at .06 at the beginning of the system and shifts over time.",
-      'Rank': "Evogulac uses the system similar to ICcup and Fish from Brood War's Ladder clients, a taste for our upcoming Ladder system. You'll have to compete to see what leads to where!"
+      'Rank': "Evogulac uses the system similar to ICcup and Fish from Brood War's Ladder clients, a taste for our upcoming Ladder system. You'll have to compete to see what leads to where!",
+      'InactiveRisk': "Players will be marked as At Risk for inactivity after being inactive for 3 weeks, or roughly 3 tournament cycles."
     };
 
     thead.innerHTML = `<tr>${headers.map(h => {
@@ -246,7 +246,7 @@ fetch(CSV_URL)
 
         if (i === inactiveIndex) {
           if (cell === '1') {
-            return `<td><img src="Assets/icons/danger_expire.png" alt="Inactive Warning" title="Inactive Risk" /></td>`;
+            return `<td><img src="Assets/icons/danger_expire.png" alt="Inactive Warning" title="This player is marked At Risk!" /></td>`;
           } else {
             return `<td class="inactive-risk-hidden"></td>`;
           }
