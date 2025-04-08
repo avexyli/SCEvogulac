@@ -30,16 +30,13 @@
       font-style: normal;
     }
 
-    .center-flex {
-      display: flex;
-      justify-content: center;
-      width: 100%;
-    }
-
     .table-wrapper {
       max-width: 875px;
+      margin: 0 auto;
       border-radius: 12px;
-      margin-left: 61.5px;
+      position: relative;
+      left: 61.5px;
+     /* box-shadow: 0 0 15px rgba(0, 0, 0, 0.25); */
     }
 
     table {
@@ -320,14 +317,12 @@
   <div class="title-image fade-in-top">
     <img src="Assets/titles/title_a.png" alt="StarCraft: Evolution Complete" class="title-img" />
   </div>
-<div class="center-flex">
   <div class="table-wrapper fade-in-bottom">
     <table id="leaderboard">
       <thead></thead>
       <tbody></tbody>
     </table>
   </div>
-</div>
   <script>
     const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSy8FqFeV1ehxYkcARDbImfb3UEPX9tnFodJk5q4bntnlg_nxHRMSLkhK1R5cedyE_qQt3j_hnM9bq8/pub?gid=172854205&single=true&output=csv';
 
