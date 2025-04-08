@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SC: Evo Ladder</title>
+  <link rel="icon" type="image/png" href="Assets/icons/favicon.png" />
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: url('Assets/background/planet_background.png') no-repeat center top scroll;
+      background-size: cover;
+      color: #fff;
+      margin: 0;
+      padding: 2rem;
+    }
+
+    .table-wrapper {
+      max-width: 960px;
+      margin: 0 auto;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.25);
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+
+    th, td {
+      padding-left: 0.75rem;
+      padding-right: 0.75rem;
+      border: 1px solid #444;
+      padding: 0.75rem;
+      text-align: center;
+      color: white;
+    }
+
+    th {
+      background-color: #2d2d2d;
+      position: relative;
+    }
+
+    .tooltip {
+      position: relative;
+      display: inline-block;
+      cursor: help;
+    }
+
+    .tooltip .tooltip-bubble {
+      visibility: hidden;
+      background-color: #333;
+      color: #fff;
+      text-align: center;
+      padding: 8px 14px;
+      border-radius: 6px;
+      position: absolute;
+      z-index: 2000;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      opacity: 0;
+      white-space: normal;
+      width: 280px;
+      max-width: 480px;
+      font-size: 0.85rem;
+      font-weight: normal;
+      transition: opacity 0.3s ease-in;
+      line-height: 1.4;
+      box-sizing: border-box;
+      word-break: break-word;
+    }
+
+    .tooltip:hover .tooltip-bubble {
+      visibility: visible;
+      opacity: 1;
+    }
+
+    .race-icon {
+      height: 20px;
+      vertical-align: middle;
+      margin: 0 4px;
+      transition: transform 0.2s ease;
+    }
+
+    .race-icon:hover {
+      transform: scale(1.15);
+    }
+
+    .title-image {
+      text-align: center;
+      margin: 1.5rem 0;
+    }
+
+    .title-img {
+      max-width: 600px;
+      width: 100%;
+      height: auto;
+    }
+
+    .fade-in-top {
+      opacity: 0;
+      transform: translateY(-30px);
+      animation: fadeInTop 1s ease-out forwards;
+    }
+
+    .fade-in-bottom {
+      opacity: 0;
+      transform: translateY(30px);
+      animation: fadeInBottom 1s ease-out forwards;
+      animation-delay: 0.5s;
+    }
+
+    @keyframes fadeInTop {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeInBottom {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .rank-S td:last-child { background: linear-gradient(to bottom, #65e2f5 15%, rgba(0, 0, 0, 0) 85%); }
+    .rank-A td:last-child { background: linear-gradient(to bottom, #28d6f0 15%, rgba(0, 0, 0, 0) 85%); }
+    .rank-B td:last-child { background: linear-gradient(to bottom, #2881f0 15%, rgba(0, 0, 0, 0) 85%); }
+    .rank-C td:last-child { background: linear-gradient(to bottom, #eef028 15%, rgba(0, 0, 0, 0) 85%); }
+    .rank-D td:last-child { background: linear-gradient(to bottom, #28f099 15%, rgba(0, 0, 0, 0) 85%); }
+    .rank-E td:last-child { background: linear-gradient(to bottom, #5cf028 15%, rgba(0, 0, 0, 0) 85%); }
+    .rank-F td:last-child { background: linear-gradient(to bottom, #f02828 15%, rgba(0, 0, 0, 0) 85%); }
+    .rank-Fm td:last-child { background: linear-gradient(to bottom, #800000 15%, rgba(0, 0, 0, 0) 85%); }
+
+    .glow-terran { text-shadow: 0 0 8px rgba(100, 170, 255, 0.8); }
+    .glow-zerg { text-shadow: 0 0 8px rgba(255, 100, 100, 0.8); }
+    .glow-protoss { text-shadow: 0 0 8px rgba(120, 255, 120, 0.8); }
+    .glow-random { text-shadow: 0 0 8px rgba(255, 255, 100, 0.8); }
+    .glow-unknown { text-shadow: 0 0 8px rgba(0, 0, 0, 0.5); }
+  </style>
+</head>
+<body>
+  <div class="title-image fade-in-top">
+    <img src="Assets/titles/title_a.png" alt="SC: Evo Title" class="title-img" />
+  </div>
+  <div class="table-wrapper fade-in-bottom">
+    <table id="leaderboard">
+      <thead></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+<script>
+    const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSy8FqFeV1ehxYkcARDbImfb3UEPX9tnFodJk5q4bntnlg_nxHRMSLkhK1R5cedyE_qQt3j_hnM9bq8/pub?gid=172854205&single=true&output=csv';
+
+    function createRaceIcons(raceValue) {
+      const iconBasePath = 'Assets/icons/';
+      const knownRaces = [
+        'BW Terran', 'BW Zerg', 'BW Protoss',
+        'SC2 Terran', 'SC2 Zerg', 'SC2 Protoss'
+      ];
+
+      if (raceValue === 'Random' || raceValue === 'Unknown') {
+        return raceValue;
+      }
+
+      const races = raceValue.split(' / ');
+      return races.map(r => {
+        if (knownRaces.includes(r)) {
+          const clean = r.replace(' ', '_');
+          const labelMap = {
+            'BW Terran': 'Brood War Terran',
+            'BW Zerg': 'Brood War Zerg',
+            'BW Protoss': 'Brood War Protoss',
+            'SC2 Terran': 'StarCraft 2 Terran',
+            'SC2 Zerg': 'StarCraft 2 Zerg',
+            'SC2 Protoss': 'StarCraft 2 Protoss'
+          };
+          const label = labelMap[r] || r;
+          return `<img class="race-icon" src="${iconBasePath}${clean}_Small.png" alt="${label}" title="${label}" />`;
+        } else {
+          return r;
+        }
+      }).join('');
+    }
+
+    fetch(CSV_URL)
+      .then(res => res.text())
+      .then(csv => {
+        const rows = csv.trim().split('\n').map(row => row.split(','));
+        const [headers, ...data] = rows;
+
+        const thead = document.querySelector('#leaderboard thead');
+        const tbody = document.querySelector('#leaderboard tbody');
+
+        const tooltipMap = {
+          'Race': "Players in StarCraft: Evolution Complete compete with both factions in StarCraft: Brood War as well as StarCraft 2, and both of their preferred choices are reflected here in the table below. If Unknown is displayed, the Player may not have enough games with a chosen pair.",
+          'Rating': "Evogulac uses the Glicko-2 Rating System and aims to pay homage to Aligulac from StarCraft 2, all players begin at 1500 and gain and lose points accordingly. The higher, the stronger the player.",
+          'RD': "Rating Deviation, the system's measurement of certainty. The lower the deviation, the more stable.",
+          'Volatility': "Volatility is the measurement of how much a player's rating tends to swing, it begins at .06 at the beginning of the system and shifts over time.",
+          'Rank': "Evogulac uses the system similar to ICcup and Fish from Brood War's Ladder clients, a taste for our upcoming Ladder system. You'll have to compete to see what leads to where!"
+        };
+
+        thead.innerHTML = `<tr>${headers.map(h => {
+          const cleanHeader = h.trim();
+          if (tooltipMap[cleanHeader]) {
+            return `<th><div class="tooltip">${cleanHeader}<div class="tooltip-bubble">${tooltipMap[cleanHeader]}</div></div></th>`;
+          }
+          return `<th>${cleanHeader}</th>`;
+        }).join('')}</tr>`;
+
+        const rdIndex = headers.findIndex(h => h.trim().toLowerCase() === 'rd');
+
+        data.forEach(row => {
+          const rdValue = parseFloat(row[rdIndex]);
+          if (isNaN(rdValue) || rdValue > 220) return;
+
+          const rankClass = 'rank-' + row[5];
+          const tr = document.createElement('tr');
+          tr.className = rankClass;
+          tr.innerHTML = row.map((cell, i) => {
+            const isVolatility = headers[i]?.trim().toLowerCase() === 'volatility';
+            const paddingStyle = isVolatility ? 'padding-left: 0.25rem; padding-right: 0.25rem;' : '';
+
+            if (i === 0) {
+              const race = row[1];
+              let glowClass = 'glow-unknown';
+              if (race.includes('Terran')) glowClass = 'glow-terran';
+              else if (race.includes('Zerg')) glowClass = 'glow-zerg';
+              else if (race.includes('Protoss')) glowClass = 'glow-protoss';
+              else if (race === 'Random') glowClass = 'glow-random';
+              else if (race === 'Unknown') glowClass = 'glow-unknown';
+              return `<td class="${glowClass}" style="${paddingStyle}">${cell}</td>`;
+            }
+
+            if (i === 1) {
+              return `<td>${createRaceIcons(cell)}</td>`;
+            }
+
+            return `<td style="${paddingStyle}">${cell}</td>`;
+          }).join('');
+          tbody.appendChild(tr);
+        });
+      })
+      .catch(err => {
+        document.querySelector('#leaderboard tbody').innerHTML = '<tr><td colspan="6">Failed to load data.</td></tr>';
+        console.error('Failed to load CSV:', err);
+      });
+</script>
+</body>
+</html>
