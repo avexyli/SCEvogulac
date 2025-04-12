@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
 
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SC: Evo Ladder</title>
-  <link rel="icon" type="image/png" href="Assets/icons/favicon.png" />
-  <style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SC: Evo Ladder</title>
+<link href="Assets/icons/favicon.png" rel="icon" type="image/png"/>
+<style>
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background: url('Assets/background/planet_background.png') no-repeat center top scroll;
@@ -318,27 +318,26 @@
     }
   </style>
 </head>
-
 <body>
-  <div class="title-image fade-in-top">
-    <img src="Assets/titles/title_a.png" alt="StarCraft: Evolution Complete" class="title-img" />
-  </div>
-<div class="center-flex">
-  <div class="table-wrapper fade-in-bottom">
-    <table id="leaderboard">
-      <thead></thead>
-      <tbody></tbody>
-    </table>
-  </div>
+<div class="title-image fade-in-top">
+<img alt="StarCraft: Evolution Complete" class="title-img" src="Assets/titles/title_a.png"/>
 </div>
-  <script>
+<div class="center-flex">
+<div class="table-wrapper fade-in-bottom">
+<table class="stagger-animate" id="leaderboard">
+<thead></thead>
+<tbody></tbody>
+</table>
+</div>
+</div>
+<script>
     const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSy8FqFeV1ehxYkcARDbImfb3UEPX9tnFodJk5q4bntnlg_nxHRMSLkhK1R5cedyE_qQt3j_hnM9bq8/pub?gid=172854205&single=true&output=csv';
 
     function createRaceIcons(raceValue) {
       const iconBasePath = 'Assets/icons/';
       const knownRaces = [
         'BW Terran', 'BW Zerg', 'BW Protoss',
-        'SC2 Terran', 'SC2 Zerg', 'SC2 Protoss', 
+        'SC2 Terran', 'SC2 Zerg', 'SC2 Protoss'
       ];
 
       if (raceValue === 'Random' || raceValue === 'Unknown') {
@@ -386,7 +385,23 @@
       }, frameRate);
     }
 
-    fetch(CSV_URL)
+    
+function countUp(element, target, duration = 3000) {
+  let start = 0;
+  const increment = Math.ceil(target / (duration / 20));
+  const interval = setInterval(() => {
+    start += increment;
+    if (start >= target) {
+      element.textContent = target;
+      clearInterval(interval);
+    } else {
+      element.textContent = start;
+    }
+  }, 20);
+}
+
+
+fetch(CSV_URL)
       .then(res => res.text())
       .then(csv => {
         /*const rows = csv.trim().split('\n').map(row => row.split(','));*/
@@ -465,18 +480,21 @@
           }).join('');
           tbody.appendChild(tr);
 
-          setTimeout(() => {
-
+          
             const cells = tr.querySelectorAll('td');
-            cells.forEach(td => {
-             /* const originalText = td.textContent;*/
+            cells.forEach((td, index) => {
               const originalText = td.getAttribute('data-final');
-             /* if (td.querySelector('img')) return; */
-             if (!originalText || td.querySelector('img')) return; // Skip icons or empty cells
-             td.setAttribute("title", originalText); // Add original username on hover
-              scrambleText(td, originalText, 600);
-            }); 
-          }, 300); // Delay after fade-in
+              if (!originalText || td.querySelector('img')) return;
+              td.setAttribute("title", originalText);
+
+              // Use countUp only for Rating (index 2)
+              if (index === 2) {
+                setTimeout(() => countUp(td, parseInt(originalText), 1500), 0);
+              } else {
+                setTimeout(() => td.textContent = originalText, 0);
+              }
+            });
+
 
         });
       })
@@ -484,7 +502,60 @@
         document.querySelector('#leaderboard tbody').innerHTML = '<tr><td colspan="7">Failed to load data.</td></tr>';
         console.error('Failed to load CSV:', err);
       });
-  </script>
-</body>
+  
+function animateColumnsInOrder(row, ratingDelay = 1800) {
+  const cells = row.querySelectorAll('td');
 
+  // Make sure all cells are invisible at start
+  cells.forEach(td => td.style.opacity = '0');
+
+  // Order: Name (0), Race (1), Rating (2), RD (3), Volatility (4)
+  const sequenceDelays = [0, 200, 400, 600, 800];
+
+  // Column indices
+  const RATING_INDEX = 2;
+  const RANK_INDEX = 5;
+
+  sequenceDelays.forEach((delay, i) => {
+    if (i === RATING_INDEX) {
+      setTimeout(() => {
+        const ratingCell = cells[i];
+        const finalRating = parseInt(ratingCell.getAttribute("data-final"), 10) || 0;
+        const duration = 3000; // total time in ms for countup
+        const steps = Math.min(finalRating, 60); // Number of steps
+        const intervalTime = Math.max(10, duration / steps);
+
+        let current = 0;
+        const step = Math.max(1, Math.floor(finalRating / steps));
+
+        ratingCell.style.opacity = '1';
+        const counter = setInterval(() => {
+          current += step;
+          if (current >= finalRating) {
+            ratingCell.textContent = finalRating;
+            clearInterval(counter);
+          } else {
+            ratingCell.textContent = current;
+          }
+        }, intervalTime);
+      }, delay);
+    } else {
+      setTimeout(() => {
+        const td = cells[i];
+        td.textContent = td.getAttribute("data-final") || "";
+        td.style.opacity = '1';
+      }, delay);
+    }
+  });
+
+  // Show RANK column after ratings are done
+  setTimeout(() => {
+    if (cells[RANK_INDEX]) {
+      cells[RANK_INDEX].textContent = cells[RANK_INDEX].getAttribute("data-final") || "";
+      cells[RANK_INDEX].style.opacity = '1';
+    }
+  }, ratingDelay + 600); // ensure it starts after rating countup finishes
+}
+</script>
+</body>
 </html>
