@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-
 <html lang="en">
+
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>SC: Evo Ladder</title>
-<link href="Assets/icons/favicon.png" rel="icon" type="image/png"/>
-<style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SC: Evo Ladder</title>
+  <link rel="icon" type="image/png" href="Assets/icons/favicon.png" />
+  <style>
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background: url('Assets/background/planet_background.png') no-repeat center top scroll;
@@ -318,19 +318,20 @@
     }
   </style>
 </head>
+
 <body>
-<div class="title-image fade-in-top">
-<img alt="StarCraft: Evolution Complete" class="title-img" src="Assets/titles/title_a.png"/>
-</div>
+  <div class="title-image fade-in-top">
+    <img src="Assets/titles/title_a.png" alt="StarCraft: Evolution Complete" class="title-img" />
+  </div>
 <div class="center-flex">
-<div class="table-wrapper fade-in-bottom">
-<table class="stagger-animate" id="leaderboard">
-<thead></thead>
-<tbody></tbody>
-</table>
+  <div class="table-wrapper fade-in-bottom">
+    <table id="leaderboard">
+      <thead></thead>
+      <tbody></tbody>
+    </table>
+  </div>
 </div>
-</div>
-<script>
+  <script>
     const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSy8FqFeV1ehxYkcARDbImfb3UEPX9tnFodJk5q4bntnlg_nxHRMSLkhK1R5cedyE_qQt3j_hnM9bq8/pub?gid=172854205&single=true&output=csv';
 
     function createRaceIcons(raceValue) {
@@ -502,60 +503,7 @@ fetch(CSV_URL)
         document.querySelector('#leaderboard tbody').innerHTML = '<tr><td colspan="7">Failed to load data.</td></tr>';
         console.error('Failed to load CSV:', err);
       });
-  
-function animateColumnsInOrder(row, ratingDelay = 1800) {
-  const cells = row.querySelectorAll('td');
-
-  // Make sure all cells are invisible at start
-  cells.forEach(td => td.style.opacity = '0');
-
-  // Order: Name (0), Race (1), Rating (2), RD (3), Volatility (4)
-  const sequenceDelays = [0, 200, 400, 600, 800];
-
-  // Column indices
-  const RATING_INDEX = 2;
-  const RANK_INDEX = 5;
-
-  sequenceDelays.forEach((delay, i) => {
-    if (i === RATING_INDEX) {
-      setTimeout(() => {
-        const ratingCell = cells[i];
-        const finalRating = parseInt(ratingCell.getAttribute("data-final"), 10) || 0;
-        const duration = 3000; // total time in ms for countup
-        const steps = Math.min(finalRating, 60); // Number of steps
-        const intervalTime = Math.max(10, duration / steps);
-
-        let current = 0;
-        const step = Math.max(1, Math.floor(finalRating / steps));
-
-        ratingCell.style.opacity = '1';
-        const counter = setInterval(() => {
-          current += step;
-          if (current >= finalRating) {
-            ratingCell.textContent = finalRating;
-            clearInterval(counter);
-          } else {
-            ratingCell.textContent = current;
-          }
-        }, intervalTime);
-      }, delay);
-    } else {
-      setTimeout(() => {
-        const td = cells[i];
-        td.textContent = td.getAttribute("data-final") || "";
-        td.style.opacity = '1';
-      }, delay);
-    }
-  });
-
-  // Show RANK column after ratings are done
-  setTimeout(() => {
-    if (cells[RANK_INDEX]) {
-      cells[RANK_INDEX].textContent = cells[RANK_INDEX].getAttribute("data-final") || "";
-      cells[RANK_INDEX].style.opacity = '1';
-    }
-  }, ratingDelay + 600); // ensure it starts after rating countup finishes
-}
-</script>
+  </script>
 </body>
+
 </html>
