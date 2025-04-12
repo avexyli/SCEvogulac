@@ -343,8 +343,11 @@
         'SC2 Terran', 'SC2 Zerg', 'SC2 Protoss'
       ];
 
-      if (raceValue === 'Random' || raceValue === 'Unknown') {
-        return raceValue;
+      if (raceValue === 'Random') {
+        return `<img class="race-icon" src="Assets/icons/Random_Small.png" alt="Random" title="Random" />`;
+      }
+      if (raceValue === 'Unknown') {
+        return `<img class="race-icon" src="Assets/icons/question_mark.png" alt="Unknown" title="Unknown" />`;
       }
 
       const races = raceValue.split(' / ');
@@ -390,35 +393,49 @@
 
     
 function countUp(element, target, duration = 2000) {
-  let start = 0;
-  const stepTime = Math.floor(duration / target);
-  element.style.opacity = '1';
+  const start = 0;
+  const steps = 200;
+  const increment = target / steps;
+  const stepTime = duration / steps;
+  let current = 0;
+  let lastTime = null;
 
-  const interval = setInterval(() => {
-    start++;
-    element.textContent = start;
-    if (start >= target) {
-      clearInterval(interval);
-      element.textContent = target;
+  function update(timestamp) {
+    if (!lastTime) lastTime = timestamp;
+    const delta = timestamp - lastTime;
 
-      if (element.dataset.masterRating === 'true') {
-        const ranks = document.querySelectorAll('td[data-col="rank"]');
-        ranks.forEach((rank, i) => {
-          setTimeout(() => {
-            rank.style.opacity = '1';
-          }, i * 330);
-        });
+    if (delta >= stepTime) {
+      lastTime = timestamp;
+      current += increment;
+      const display = Math.min(Math.floor(current), target);
+      element.textContent = display;
+      element.style.opacity = '1';
+
+      if (display >= target) {
+        element.textContent = target;
+        // Ensure DOM visually updates before triggering Rank
+        if (element.dataset.masterRating === 'true') {
+          requestAnimationFrame(() => {
+            revealRanks();
+          });
+        }
+        return;
       }
     }
-  }, stepTime);
-}, i * 150);
-        });
-      }
-    } else {
-      element.textContent = start;
-    element.style.opacity = '1';
-    }
-  }, 20);
+    requestAnimationFrame(update);
+  }
+
+  requestAnimationFrame(update);
+}
+
+
+
+async function revealRanks() {
+  const ranks = document.querySelectorAll('td[data-col="rank"]');
+  for (let i = 0; i < ranks.length; i++) {
+    ranks[i].style.opacity = '1';
+    await new Promise(resolve => setTimeout(resolve, 330));
+  }
 }
 
 

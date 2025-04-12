@@ -343,8 +343,11 @@
         'SC2 Terran', 'SC2 Zerg', 'SC2 Protoss'
       ];
 
-      if (raceValue === 'Random' || raceValue === 'Unknown') {
-        return raceValue;
+      if (raceValue === 'Random') {
+        return `<img class="race-icon" src="Assets/icons/Random_Small.png" alt="Random" title="Random" />`;
+      }
+      if (raceValue === 'Unknown') {
+        return `<img class="race-icon" src="Assets/icons/question_mark.png" alt="Unknown" title="Unknown" />`;
       }
 
       const races = raceValue.split(' / ');
