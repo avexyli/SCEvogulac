@@ -390,9 +390,9 @@
         };
 
         thead.innerHTML = `<tr>${headers.map(h => {
-          if (h === 'InactiveRisk') return `<th class="inactive-risk-header tooltip"><img src="Assets/icons/question_mark.png" class="question-icon" alt="Inactive Risk" /><div class="tooltip-bubble">\${tooltipMap[h]}</div></th>`;
-          if (tooltipMap[h]) return `<th><div class="tooltip">\${h}<div class="tooltip-bubble">\${tooltipMap[h]}</div></div></th>`;
-          return `<th>\${h}</th>`;
+          if (h === 'InactiveRisk') return \`<th class="inactive-risk-header tooltip"><img src="Assets/icons/question_mark.png" class="question-icon" alt="Inactive Risk" /><div class="tooltip-bubble">\${tooltipMap[h]}</div></th>\`;
+          if (tooltipMap[h]) return \`<th><div class="tooltip">\${h}<div class="tooltip-bubble">\${tooltipMap[h]}</div></div></th>\`;
+          return \`<th>\${h}</th>\`;
         }).join('')}</tr>`;
 
         let rowElements = [];
@@ -412,17 +412,17 @@
               else if (race.includes('Zerg')) glowClass = 'glow-zerg';
               else if (race.includes('Protoss')) glowClass = 'glow-protoss';
               else if (race === 'Random') glowClass = 'glow-random';
-              return `<td class="\${glowClass}" data-col="name">\${cell}</td>`;
+              return \`<td class="\${glowClass}" data-col="name">\${cell}</td>\`;
             }
-            if (i === 1) return `<td data-col="race">\${createRaceIcons(cell)}</td>`;
-            if (headers[i] === 'Rating') return `<td data-col="rating" data-rating="\${cell}">0000</td>`;
-            if (headers[i] === 'RD') return `<td data-col="rd" style="opacity:0">\${cell}</td>`;
-            if (headers[i] === 'Volatility') return `<td data-col="vol" style="opacity:0">\${cell}</td>`;
-            if (headers[i] === 'Rank') return `<td data-col="rank" style="opacity:0">\${cell}</td>`;
+            if (i === 1) return \`<td data-col="race">\${createRaceIcons(cell)}</td>\`;
+            if (headers[i] === 'Rating') return \`<td data-col="rating" data-rating="\${cell}">0000</td>\`;
+            if (headers[i] === 'RD') return \`<td data-col="rd" style="opacity:0">\${cell}</td>\`;
+            if (headers[i] === 'Volatility') return \`<td data-col="vol" style="opacity:0">\${cell}</td>\`;
+            if (headers[i] === 'Rank') return \`<td data-col="rank" style="opacity:0">\${cell}</td>\`;
             if (isInactiveRisk) return cell === '1'
-              ? `<td class="inactive-risk-visible tooltip"><img src="Assets/icons/danger_expire.png" class="danger-icon" alt="At Risk" /><div class="tooltip-bubble">This player is marked At Risk!</div></td>`
-              : `<td class="inactive-risk-hidden"></td>`;
-            return `<td>\${cell}</td>`;
+              ? \`<td class="inactive-risk-visible tooltip"><img src="Assets/icons/danger_expire.png" class="danger-icon" alt="At Risk" /><div class="tooltip-bubble">This player is marked At Risk!</div></td>\`
+              : \`<td class="inactive-risk-hidden"></td>\`;
+            return \`<td>\${cell}</td>\`;
           }).join('');
           tbody.appendChild(tr);
           rowElements.push(tr);
@@ -438,7 +438,7 @@
 
           setTimeout(() => {
             ['name', 'race', 'rating', 'rd', 'vol'].forEach((col, colIndex) => {
-              const cells = document.querySelectorAll(`td[data-col="\${col}"]`);
+              const cells = document.querySelectorAll(\`td[data-col="\${col}"]\`);
               setTimeout(() => {
                 cells.forEach(cell => {
                   if (col === 'rating') countUp(cell, parseInt(cell.dataset.rating));
