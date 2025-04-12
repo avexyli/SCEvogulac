@@ -389,29 +389,20 @@
     }
 
     
-function countUp(element, target, duration = 2000) {
+function countUp(element, target, duration = 3000) {
   let start = 0;
-  const stepTime = Math.floor(duration / target);
-  element.style.opacity = '1';
-
+  const increment = Math.ceil(target / (duration / 20));
   const interval = setInterval(() => {
-    start++;
-    element.textContent = start;
+    start += increment;
     if (start >= target) {
-      clearInterval(interval);
       element.textContent = target;
-
+      clearInterval(interval);
       if (element.dataset.masterRating === 'true') {
         const ranks = document.querySelectorAll('td[data-col="rank"]');
         ranks.forEach((rank, i) => {
           setTimeout(() => {
             rank.style.opacity = '1';
-          }, i * 330);
-        });
-      }
-    }
-  }, stepTime);
-}, i * 150);
+          }, i * 150);
         });
       }
     } else {
