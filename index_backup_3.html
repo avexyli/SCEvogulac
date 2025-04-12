@@ -338,7 +338,7 @@
       const iconBasePath = 'Assets/icons/';
       const knownRaces = [
         'BW Terran', 'BW Zerg', 'BW Protoss',
-        'SC2 Terran', 'SC2 Zerg', 'SC2 Protoss'
+        'SC2 Terran', 'SC2 Zerg', 'SC2 Protoss', 
       ];
 
       if (raceValue === 'Random' || raceValue === 'Unknown') {
@@ -386,23 +386,7 @@
       }, frameRate);
     }
 
-    
-function countUp(element, target, duration = 3000) {
-  let start = 0;
-  const increment = Math.ceil(target / (duration / 20));
-  const interval = setInterval(() => {
-    start += increment;
-    if (start >= target) {
-      element.textContent = target;
-      clearInterval(interval);
-    } else {
-      element.textContent = start;
-    }
-  }, 20);
-}
-
-
-fetch(CSV_URL)
+    fetch(CSV_URL)
       .then(res => res.text())
       .then(csv => {
         /*const rows = csv.trim().split('\n').map(row => row.split(','));*/
@@ -481,34 +465,18 @@ fetch(CSV_URL)
           }).join('');
           tbody.appendChild(tr);
 
-        const rows = Array.from(tbody.querySelectorAll('tr'));
-        rows.forEach(row => {
-          Array.from(row.cells).forEach(cell => {
-            if (!cell.querySelector('img')) {
-              cell.style.visibility = "hidden";
-            }
-          });
-        });
+          setTimeout(() => {
 
-        revealColumnsSequentially(rows, [0, 1, 2, 3, 4], 300);
-        revealRanksAfterDelay(rows, 5, 3000, 180);
-
-
-          
             const cells = tr.querySelectorAll('td');
-            cells.forEach((td, index) => {
+            cells.forEach(td => {
+             /* const originalText = td.textContent;*/
               const originalText = td.getAttribute('data-final');
-              if (!originalText || td.querySelector('img')) return;
-              td.setAttribute("title", originalText);
-
-              // Use countUp only for Rating (index 2)
-              if (index === 2) {
-                setTimeout(() => countUp(td, parseInt(originalText), 1500), 0);
-              } else {
-                setTimeout(() => td.textContent = originalText, 0);
-              }
-            });
-
+             /* if (td.querySelector('img')) return; */
+             if (!originalText || td.querySelector('img')) return; // Skip icons or empty cells
+             td.setAttribute("title", originalText); // Add original username on hover
+              scrambleText(td, originalText, 600);
+            }); 
+          }, 300); // Delay after fade-in
 
         });
       })
