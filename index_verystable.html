@@ -413,7 +413,12 @@ function countUp(element, target, duration = 2000) {
         // Ensure DOM visually updates before triggering Rank
         if (element.dataset.masterRating === 'true') {
           requestAnimationFrame(() => {
-            revealRanks();
+            const ranks = document.querySelectorAll('td[data-col="rank"]');
+            ranks.forEach((rank, i) => {
+              setTimeout(() => {
+                rank.style.opacity = '1';
+              }, i * 330);
+            });
           });
         }
         return;
@@ -423,16 +428,6 @@ function countUp(element, target, duration = 2000) {
   }
 
   requestAnimationFrame(update);
-}
-
-
-
-async function revealRanks() {
-  const ranks = document.querySelectorAll('td[data-col="rank"]');
-  for (let i = 0; i < ranks.length; i++) {
-    ranks[i].style.opacity = '1';
-    await new Promise(resolve => setTimeout(resolve, 330));
-  }
 }
 
 
