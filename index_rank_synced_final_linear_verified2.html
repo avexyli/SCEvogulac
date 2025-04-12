@@ -397,6 +397,7 @@ function countUp(element, target, duration = 2000) {
   const interval = setInterval(() => {
     start++;
     element.textContent = start;
+
     if (start >= target) {
       clearInterval(interval);
       element.textContent = target;
@@ -411,7 +412,7 @@ function countUp(element, target, duration = 2000) {
       }
     }
   }, stepTime);
-  }
+}
 
 
 fetch(CSV_URL)
