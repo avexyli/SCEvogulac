@@ -331,7 +331,6 @@
     </table>
   </div>
 </div>
-  
   <script>
     const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSy8FqFeV1ehxYkcARDbImfb3UEPX9tnFodJk5q4bntnlg_nxHRMSLkhK1R5cedyE_qQt3j_hnM9bq8/pub?gid=172854205&single=true&output=csv';
 
@@ -341,8 +340,13 @@
         'BW Terran', 'BW Zerg', 'BW Protoss',
         'SC2 Terran', 'SC2 Zerg', 'SC2 Protoss'
       ];
-      if (raceValue === 'Random' || raceValue === 'Unknown') return raceValue;
-      return raceValue.split(' / ').map(r => {
+
+      if (raceValue === 'Random' || raceValue === 'Unknown') {
+        return raceValue;
+      }
+
+      const races = raceValue.split(' / ');
+      return races.map(r => {
         if (knownRaces.includes(r)) {
           const clean = r.replace(' ', '_');
           const labelMap = {
@@ -360,23 +364,56 @@
         }
       }).join('');
     }
+    function scrambleText(element, finalText, duration = 800, charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789") {
+      const frameRate = 30;
+      const steps = Math.floor(duration / frameRate);
+      let currentStep = 0;
 
-    function countUp(element, target, duration = 3000) {
-      let start = 0;
-      const stepTime = Math.max(Math.floor(duration / target), 15);
-      const step = () => {
-        start++;
-        element.textContent = start;
-        if (start < target) setTimeout(step, stepTime);
-      };
-      step();
+      const scrambleInterval = setInterval(() => {
+        let display = '';
+        for (let i = 0; i < finalText.length; i++) {
+          if (currentStep < steps) {
+            display += charset[Math.floor(Math.random() * charset.length)];
+          } else {
+            display += finalText[i];
+          }
+        }
+
+        element.textContent = display;
+        currentStep++;
+
+        if (currentStep > steps) clearInterval(scrambleInterval);
+      }, frameRate);
     }
 
-    fetch(CSV_URL)
+    
+function countUp(element, target, duration = 3000) {
+  let start = 0;
+  const increment = Math.ceil(target / (duration / 20));
+  const interval = setInterval(() => {
+    start += increment;
+    if (start >= target) {
+      element.textContent = target;
+      clearInterval(interval);
+    } else {
+      element.textContent = start;
+    }
+  }, 20);
+}
+
+
+fetch(CSV_URL)
       .then(res => res.text())
       .then(csv => {
-        const rows = csv.trim().split('\n').map(row => row.split(',')).filter(row => row.some(cell => cell.trim() !== ''));
+        /*const rows = csv.trim().split('\n').map(row => row.split(','));*/
+        const rows = csv
+          .trim()
+          .split('\n')
+          .map(row => row.split(','))
+          .filter(row => row.some(cell => cell.trim() !== ''));
+
         const [headers, ...data] = rows;
+
         const thead = document.querySelector('#leaderboard thead');
         const tbody = document.querySelector('#leaderboard tbody');
 
@@ -390,21 +427,30 @@
         };
 
         thead.innerHTML = `<tr>${headers.map(h => {
-          if (h === 'InactiveRisk') return `<th class="inactive-risk-header tooltip"><img src="Assets/icons/question_mark.png" class="question-icon" alt="Inactive Risk" /><div class="tooltip-bubble">${tooltipMap[h]}</div></th>`;
-          if (tooltipMap[h]) return `<th><div class="tooltip">${h}<div class="tooltip-bubble">${tooltipMap[h]}</div></div></th>`;
-          return `<th>${h}</th>`;
+          const cleanHeader = h.trim();
+          if (cleanHeader === 'InactiveRisk') {
+            return `<th class="inactive-risk-header tooltip">
+              <img src="Assets/icons/question_mark.png" class="question-icon" alt="Inactive Risk" />
+              <div class="tooltip-bubble">${tooltipMap[cleanHeader]}</div>
+            </th>`;
+          }
+          if (tooltipMap[cleanHeader]) {
+            return `<th><div class="tooltip">${cleanHeader}<div class="tooltip-bubble">${tooltipMap[cleanHeader]}</div></div></th>`;
+          }
+          return `<th>${cleanHeader}</th>`;
         }).join('')}</tr>`;
-
-        let rowElements = [];
 
         data.forEach(row => {
           if (parseFloat(row[headers.indexOf('RD')]) > 220) return;
+
           const rankClass = 'rank-' + row[5];
           const tr = document.createElement('tr');
           tr.className = rankClass;
-          tr.style.opacity = '0';
           tr.innerHTML = row.map((cell, i) => {
-            const isInactiveRisk = headers[i] === 'InactiveRisk';
+            const isVolatility = headers[i]?.trim().toLowerCase() === 'volatility';
+            const isInactiveRisk = headers[i]?.trim() === 'InactiveRisk';
+            const paddingStyle = isVolatility ? 'padding-left: 0.25rem; padding-right: 0.25rem;' : '';
+
             if (i === 0) {
               const race = row[1];
               let glowClass = 'glow-unknown';
@@ -412,58 +458,52 @@
               else if (race.includes('Zerg')) glowClass = 'glow-zerg';
               else if (race.includes('Protoss')) glowClass = 'glow-protoss';
               else if (race === 'Random') glowClass = 'glow-random';
-              return `<td class="${glowClass}" data-col="name">${cell}</td>`;
+              else if (race === 'Unknown') glowClass = 'glow-unknown';
+              return `<td class="${glowClass}" style="${paddingStyle}">${cell}</td>`;
             }
-            if (i === 1) return `<td data-col="race">${createRaceIcons(cell)}</td>`;
-            if (headers[i] === 'Rating') return `<td data-col="rating" data-rating="${cell}">0000</td>`;
-            if (headers[i] === 'RD') return `<td data-col="rd" style="opacity:0">${cell}</td>`;
-            if (headers[i] === 'Volatility') return `<td data-col="vol" style="opacity:0">${cell}</td>`;
-            if (headers[i] === 'Rank') return `<td data-col="rank" style="opacity:0">${cell}</td>`;
-            if (isInactiveRisk) return cell === '1'
-              ? `<td class="inactive-risk-visible tooltip"><img src="Assets/icons/danger_expire.png" class="danger-icon" alt="At Risk" /><div class="tooltip-bubble">This player is marked At Risk!</div></td>`
-              : `<td class="inactive-risk-hidden"></td>`;
-            return `<td>${cell}</td>`;
+
+            if (i === 1) {
+              return `<td>${createRaceIcons(cell)}</td>`;
+            }
+
+            if (isInactiveRisk) {
+              if (cell === '1') {
+                return `<td class="inactive-risk-visible tooltip">
+                  <img src="Assets/icons/danger_expire.png" class="danger-icon" alt="At Risk" />
+                  <div class="tooltip-bubble">This player is marked At Risk!</div>
+                </td>`;
+              }
+              return `<td class="inactive-risk-hidden"></td>`;
+            }
+
+            /*return `<td style="${paddingStyle}">${cell}</td>`;*/
+            return `<td style="${paddingStyle}" data-final="${cell}"></td>`;
           }).join('');
           tbody.appendChild(tr);
-          rowElements.push(tr);
-        });
 
-        let delay = 0;
-        setTimeout(() => {
-          rowElements.forEach((row, index) => {
-            setTimeout(() => {
-              row.style.opacity = '1';
-            }, index * 40);
-          });
+          
+            const cells = tr.querySelectorAll('td');
+            cells.forEach((td, index) => {
+              const originalText = td.getAttribute('data-final');
+              if (!originalText || td.querySelector('img')) return;
+              td.setAttribute("title", originalText);
 
-          setTimeout(() => {
-            ['name', 'race', 'rating', 'rd', 'vol'].forEach((col, colIndex) => {
-              const cells = document.querySelectorAll(`td[data-col="${col}"]`);
-              setTimeout(() => {
-                cells.forEach(cell => {
-                  if (col === 'rating') countUp(cell, parseInt(cell.dataset.rating));
-                  else cell.style.opacity = '1';
-                });
-              }, colIndex * 250);
+              // Use countUp only for Rating (index 2)
+              if (index === 2) {
+                setTimeout(() => countUp(td, parseInt(originalText), 1500), 0);
+              } else {
+                setTimeout(() => td.textContent = originalText, 0);
+              }
             });
 
-            setTimeout(() => {
-              const ranks = document.querySelectorAll('td[data-col="rank"]');
-              ranks.forEach((rank, i) => {
-                setTimeout(() => {
-                  rank.style.opacity = '1';
-                }, i * 150);
-              });
-            }, 2000);
-          }, 800);
-        }, 300);
+
+        });
       })
       .catch(err => {
         document.querySelector('#leaderboard tbody').innerHTML = '<tr><td colspan="7">Failed to load data.</td></tr>';
         console.error('Failed to load CSV:', err);
       });
   </script>
-
 </body>
 
 </html>
