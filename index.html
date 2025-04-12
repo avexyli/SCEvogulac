@@ -429,12 +429,12 @@ function countUp(element, target, duration = 2000) {
 }
 
 
-
+// Rank Reveal
 async function revealRanks() {
   const ranks = document.querySelectorAll('td[data-col="rank"]');
   for (let i = 0; i < ranks.length; i++) {
     ranks[i].style.opacity = '1';
-    await new Promise(resolve => setTimeout(resolve, 330));
+    await new Promise(resolve => setTimeout(resolve, 150));
   }
 }
 
