@@ -497,34 +497,6 @@ fetch(CSV_URL)
             });
 
 
-        
-          const colKeys = ['name', 'race', 'rating', 'rd', 'vol'];
-          const allDelays = [];
-          setTimeout(() => {
-            colKeys.forEach((col, colIndex) => {
-              const cells = document.querySelectorAll(`td[data-col="${col}"]`);
-              const delay = colIndex * 300;
-              allDelays.push(delay);
-              setTimeout(() => {
-                cells.forEach(cell => {
-                  if (col === 'rating') {
-                    countUp(cell, parseInt(cell.dataset.rating), 2000);
-                  } else {
-                    cell.style.opacity = '1';
-                  }
-                });
-              }, delay);
-            });
-            const totalDelay = Math.max(...allDelays) + 2000;
-            setTimeout(() => {
-              const ranks = document.querySelectorAll('td[data-col="rank"]');
-              ranks.forEach((rank, i) => {
-                setTimeout(() => {
-                  rank.style.opacity = '1';
-                }, i * 150);
-              });
-            }, totalDelay);
-          }, 300);
         });
       })
       .catch(err => {
