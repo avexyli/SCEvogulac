@@ -397,6 +397,14 @@ function countUp(element, target, duration = 3000) {
     if (start >= target) {
       element.textContent = target;
       clearInterval(interval);
+      if (element.dataset.masterRating === 'true') {
+        const ranks = document.querySelectorAll('td[data-col="rank"]');
+        ranks.forEach((rank, i) => {
+          setTimeout(() => {
+            rank.style.opacity = '1';
+          }, i * 150);
+        });
+      }
     } else {
       element.textContent = start;
     element.style.opacity = '1';
@@ -480,7 +488,7 @@ fetch(CSV_URL)
             }
 
             /*return `<td style="${paddingStyle}">${cell}</td>`;*/
-            if (headers[i].trim().toLowerCase() === "rating") return `<td style="opacity:0; ${paddingStyle}" data-rating="${cell}" data-col="rating">0000</td>`;
+            if (headers[i].trim().toLowerCase() === "rating") return `<td style="opacity:0; ${paddingStyle}" data-rating="${cell}" data-col="rating" data-master-rating="true">0000</td>`;
             if (headers[i].trim().toLowerCase() === "rd") return `<td style="opacity:0; ${paddingStyle}" data-col="rd">${cell}</td>`;
             if (headers[i].trim().toLowerCase() === "volatility") return `<td style="opacity:0; ${paddingStyle}" data-col="vol">${cell}</td>`;
             return `<td style="opacity:0; ${paddingStyle}" data-final="${cell}" data-col="${headers[i].trim().toLowerCase()}"></td>`;
