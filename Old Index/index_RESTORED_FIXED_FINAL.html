@@ -419,7 +419,7 @@
             if (headers[i] === 'RD') return `<td data-col="rd" style="opacity:0">${cell}</td>`;
             if (headers[i] === 'Volatility') return `<td data-col="vol" style="opacity:0">${cell}</td>`;
             if (headers[i] === 'Rank') return `<td data-col="rank" style="opacity:0">${cell}</td>`;
-            if (isInactiveRisk) return cell === '2'
+            if (isInactiveRisk) return cell === '1'
               ? `<td class="inactive-risk-visible tooltip"><img src="Assets/icons/danger_expire.png" class="danger-icon" alt="At Risk" /><div class="tooltip-bubble">This player is marked At Risk!</div></td>`
               : `<td class="inactive-risk-hidden"></td>`;
             return `<td>${cell}</td>`;
@@ -441,21 +441,7 @@
               const cells = document.querySelectorAll(`td[data-col="${col}"]`);
               setTimeout(() => {
                 cells.forEach(cell => {
-                  if (col === 'rating') {
-  countUp(cell, parseInt(cell.dataset.rating));
-  if (colIndex === 2 && cell === cells[cells.length - 1]) {
-    setTimeout(() => {
-      const ranks = document.querySelectorAll('td[data-col="rank"]');
-      ranks.forEach((rank, i) => {
-        setTimeout(() => {
-          rank.style.opacity = '1';
-        }, i * 150);
-      });
-    }, 3000);
-  }
-} else {
-  cell.style.opacity = '1';
-}
+                  if (col === 'rating') countUp(cell, parseInt(cell.dataset.rating));
                   else cell.style.opacity = '1';
                 });
               }, colIndex * 250);
@@ -468,7 +454,7 @@
                   rank.style.opacity = '1';
                 }, i * 150);
               });
-            }, 3000);
+            }, 2000);
           }, 800);
         }, 300);
       })
