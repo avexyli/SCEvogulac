@@ -496,43 +496,48 @@ fetch(CSV_URL)
           const tr = document.createElement('tr');
           tr.className = rankClass;
           tr.innerHTML = headersFiltered.map((h, i) => {
-  const cell = row[headers.indexOf(h)];
-  const isVolatility = headers[i]?.trim().toLowerCase() === 'volatility';
-  const isInactiveRisk = headers[i]?.trim() === 'InactiveRisk';
-  const paddingStyle = isVolatility ? 'padding-left: 0.25rem; padding-right: 0.25rem;' : '';
+            const cell = row[headers.indexOf(h)];
+            const isVolatility = headers[i]?.trim().toLowerCase() === 'volatility';
+            const isInactiveRisk = headers[i]?.trim() === 'InactiveRisk';
+            const paddingStyle = isVolatility ? 'padding-left: 0.25rem; padding-right: 0.25rem;' : '';
 
-  if (i === 0) {
-    const race = row[1];
-    let glowClass = 'glow-unknown';
-    if (race.includes('Terran')) glowClass = 'glow-terran';
-    else if (race.includes('Zerg')) glowClass = 'glow-zerg';
-    else if (race.includes('Protoss')) glowClass = 'glow-protoss';
-    else if (race === 'Random') glowClass = 'glow-random';
-    else if (race === 'Unknown') glowClass = 'glow-unknown';
-    return `<td class="${glowClass}" style="opacity:0; ${paddingStyle}" data-col="name">${cell}</td>`;
-  } else if (i === 1) {
-    return `<td style="opacity:0;" data-col="race">${createRaceIcons(cell)}</td>`;
-  } else if (isInactiveRisk) {
-    if (cell === '1') {
-      return `<td class="inactive-risk-visible tooltip">
-        <img src="Assets/icons/danger_expire.png" class="danger-icon" alt="At Risk" />
-        <div class="tooltip-bubble">This player is marked At Risk!</div>
-      </td>`;
-    }
-    return `<td class="inactive-risk-hidden"></td>`;
-  } else if (h.trim().toLowerCase() === "rating") {
-    return `<td style="opacity:0; ${paddingStyle}" data-rating="${cell}" data-col="rating" data-master-rating="true">0000</td>`;
-  } else if (h.trim().toLowerCase() === "rd") {
-    return `<td style="opacity:0; ${paddingStyle}" data-col="rd">${cell}</td>`;
-  } else if (h.trim().toLowerCase() === "rank") {
-    const rankValue = cell.toLowerCase();
-    return `<td data-col="rank" class="rank-icon-cell" style="opacity:0;">
-      <img src="Assets/ranks/rank-${rankValue}.png" alt="Rank ${cell}" class="rank-icon" />
-    </td>`;
-  } else {
-    return `<td style="opacity:0; ${paddingStyle}" data-final="${cell}" data-col="${h.trim().toLowerCase()}"></td>`;
-  }
-}).join('');
+            if (i === 0) {
+              const race = row[1];
+              let glowClass = 'glow-unknown';
+              if (race.includes('Terran')) glowClass = 'glow-terran';
+              else if (race.includes('Zerg')) glowClass = 'glow-zerg';
+              else if (race.includes('Protoss')) glowClass = 'glow-protoss';
+              else if (race === 'Random') glowClass = 'glow-random';
+              else if (race === 'Unknown') glowClass = 'glow-unknown';
+              return `<td class="${glowClass}" style="opacity:0; ${paddingStyle}" data-col="name">${cell}</td>`;
+            }
+
+            if (i === 1) {
+              return `<td style="opacity:0;" data-col="race">${createRaceIcons(cell)}</td>`;
+            }
+
+            if (isInactiveRisk) {
+              if (cell === '1') {
+                return `<td class="inactive-risk-visible tooltip">
+                  <img src="Assets/icons/danger_expire.png" class="danger-icon" alt="At Risk" />
+                  <div class="tooltip-bubble">This player is marked At Risk!</div>
+                </td>`;
+              }
+              return `<td class="inactive-risk-hidden"></td>`;
+            }
+
+            /*return `<td style="${paddingStyle}">${cell}</td>`;*/
+            if (headers[i].trim().toLowerCase() === "rating") {
+  return `<td style="opacity:0; ${paddingStyle}" data-rating="${cell}" data-col="rating" data-master-rating="true">0000</td>`;
+} else if (headers[i].trim().toLowerCase() === "rd") {
+  return `<td style="opacity:0; ${paddingStyle}" data-col="rd">${cell}</td>`;
+} else if (headers[i].trim().toLowerCase() === "rank") {
+  const rankValue = cell.toLowerCase();
+  return `<td data-col="rank" class="rank-icon-cell" style="opacity:0;"><img src="Assets/ranks/rank-${rankValue}.png" alt="Rank ${cell}" class="rank-icon" /></td>`;
+} else {
+  return `<td style="opacity:0; ${paddingStyle}" data-final="${cell}" data-col="${headers[i].trim().toLowerCase()}"></td>`;
+}
+          }).join('');
           tbody.appendChild(tr);
 
           
@@ -571,8 +576,6 @@ fetch(CSV_URL)
             });
             
           }, 300);
-        });
-      })
       .catch(err => {
         document.querySelector('#leaderboard tbody').innerHTML = '<tr><td colspan="7">Failed to load data.</td></tr>';
         console.error('Failed to load CSV:', err);
