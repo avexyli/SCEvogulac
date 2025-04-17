@@ -160,53 +160,21 @@
 
     /* RANKS */
 
-    .rank-S td:nth-child(6) {
-      background: linear-gradient(to bottom, #6ae5f8c2 0%, rgba(0, 0, 0, 0) 60%, transparent 100%);
-      text-shadow: 0 0 8px #6de6f8, 0 0 12px #65e2f5;
-      font-size: 1.35rem !important;
-    }
+    
 
-    .rank-A td:nth-child(6) {
-      background: linear-gradient(to bottom, #28d5f0b7 0%, rgba(0, 0, 0, 0) 60%, transparent 100%);
-      text-shadow: 0 0 8px #28d6f0, 0 0 12px #28d6f0;
-      font-size: 1.32rem !important;
-    }
+    
 
-    .rank-B td:nth-child(6) {
-      background: linear-gradient(to bottom, #2882f0b0 0%, rgba(0, 0, 0, 0) 60%, transparent 100%);
-      text-shadow: 0 0 8px #2881f0, 0 0 12px #2881f0;
-      font-size: 1.2rem !important;
-    }
+    
 
-    .rank-C td:nth-child(6) {
-      background: linear-gradient(to bottom, #edf028c7 0%, rgba(0, 0, 0, 0) 60%, transparent 100%);
-      text-shadow: 0 0 8px #eef028, 0 0 12px #eef028;
-      font-size: 1.2rem !important;
-    }
+    
 
-    .rank-D td:nth-child(6) {
-      background: linear-gradient(to bottom, #28f099b0 0%, rgba(0, 0, 0, 0) 60%, transparent 100%);
-      text-shadow: 0 0 8px #28f099, 0 0 12px #28f099;
-      font-size: 1.2rem !important;
-    }
+    
 
-    .rank-E td:nth-child(6) {
-      background: linear-gradient(to bottom, #5df028b4 0%, rgba(0, 0, 0, 0) 60%, transparent 100%);
-      text-shadow: 0 0 8px #5cf028, 0 0 12px #5cf028;
-      font-size: 1.2rem !important;
-    }
+    
 
-    .rank-F td:nth-child(6) {
-      background: linear-gradient(to bottom, #f02828c5 0%, rgba(0, 0, 0, 0) 60%, transparent 100%);
-      text-shadow: 0 0 8px #f02828, 0 0 12px #f02828;
-      font-size: 1.2rem !important;
-    }
+    
 
-    .rank-Fm td:nth-child(6) {
-      background: linear-gradient(to bottom, #800000b6 0%, rgba(0, 0, 0, 0) 60%, transparent 100%);
-      text-shadow: 0 0 8px #800000, 0 0 12px #800000;
-      font-size: 1.2rem !important;
-    }
+    
 
     /* END RANKS */
 
@@ -562,13 +530,11 @@ fetch(CSV_URL)
             if (headers[i].trim().toLowerCase() === "rating") return `<td style="opacity:0; ${paddingStyle}" data-rating="${cell}" data-col="rating" data-master-rating="true">0000</td>`;
             if (headers[i].trim().toLowerCase() === "rd") return `<td style="opacity:0; ${paddingStyle}" data-col="rd">${cell}</td>`;
             if (headers[i].trim().toLowerCase() === "volatility") return `<td style="opacity:0; ${paddingStyle}" data-col="vol">${cell}</td>`;
-            if (headers[i].trim().toLowerCase() === "rank") {
-              const rankValue = cell.toLowerCase();
-              return `<td data-col="rank" class="rank-icon-cell" style="opacity:0;">`
-                + `<img src="Assets/ranks/rank-${rankValue}.png" alt="Rank ${cell}" class="rank-icon" />`
-                + `</td>`;
-            }
+            const rankValue = cell.toLowerCase();
+              return `<td data-col="rank" class="rank-icon-cell" style="opacity:0;"><img src="Assets/ranks/rank-${rankValue}.png" alt="Rank ${cell}" class="rank-icon" /></td>`;
+            } else {
             return `<td style="opacity:0; ${paddingStyle}" data-final="${cell}" data-col="${headers[i].trim().toLowerCase()}"></td>`;
+            }
           }).join('');
           tbody.appendChild(tr);
 
@@ -589,7 +555,7 @@ fetch(CSV_URL)
 
 
         
-          const colKeys = ['name', 'race', 'rating', 'rd', 'vol'];
+          const colKeys = ['name', 'race', 'rating', 'rd'];
           const allDelays = [];
           setTimeout(() => {
             colKeys.forEach((col, colIndex) => {
@@ -608,7 +574,6 @@ fetch(CSV_URL)
             });
             
           }, 300);
-        });
       })
       .catch(err => {
         document.querySelector('#leaderboard tbody').innerHTML = '<tr><td colspan="7">Failed to load data.</td></tr>';
