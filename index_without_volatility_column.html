@@ -39,7 +39,7 @@
     .table-wrapper {
       max-width: 875px;
       border-radius: 12px;
-      margin-left: 62.5px;
+      margin-left: 120px;
     }
 
     table {
@@ -318,11 +318,54 @@
     .glow-unknown {
       text-shadow: 0 0 8px rgba(0, 0, 0, 1);
     }
-  </style>
+  
+    .top-links {
+      display: flex;
+      justify-content: center;
+      margin-top: 1rem;
+      margin-bottom: 1rem;
+      gap: 1.75rem;
+    }
+
+    .top-links a {
+      font-family: 'Orbitron', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-size: 1.05rem;
+      text-decoration: none;
+      color: white;
+      text-shadow: 0 0 5px #5dba95, 0 0 10px #5dba95;
+      transition: text-shadow 0.3s ease;
+    }
+
+    .top-links a:hover {
+      text-shadow: 0 0 8px #5dba95, 0 0 14px #5dba95;
+    }
+
+
+    .rank-icon-cell {
+      border: none !important;
+      background: transparent !important;
+      box-shadow: none !important;
+      padding: 0;
+      text-align: center;
+    }
+
+    .rank-icon {
+      height: 34px;
+      vertical-align: middle;
+    }
+
+</style>
 </head>
 
 <body>
-  <div class="title-image fade-in-top">
+  
+  <div class="top-links fade-in-top">
+    <a href="https://liquipedia.net/starcraft2/StarCraft_Evolution_League" target="_blank">StarCraft: EVO League: Code S</a>
+    <a href="https://liquipedia.net/starcraft2/SEL_Code_A" target="_blank">StarCraft: EVO League: Code A</a>
+    <a href="https://teamkoprulu.github.io/Koprulu-Blog/" target="_blank">Blog and Patch Notes</a>
+  </div>
+
+<div class="title-image fade-in-top">
     <img src="Assets/titles/title_a.png" alt="StarCraft: Evolution Complete" class="title-img" />
   </div>
 <div class="center-flex">
@@ -429,12 +472,12 @@ function countUp(element, target, duration = 2000) {
 }
 
 
-
+// Rank Reveal
 async function revealRanks() {
   const ranks = document.querySelectorAll('td[data-col="rank"]');
   for (let i = 0; i < ranks.length; i++) {
     ranks[i].style.opacity = '1';
-    await new Promise(resolve => setTimeout(resolve, 330));
+    await new Promise(resolve => setTimeout(resolve, 150));
   }
 }
 
@@ -458,7 +501,6 @@ fetch(CSV_URL)
           'Race': "Players in StarCraft: Evolution Complete compete with both factions in StarCraft: Brood War as well as StarCraft 2, and both of their preferred choices are reflected here in the table below. If Unknown is displayed, the Player may not have enough games with a chosen pair.",
           'Rating': "Evogulac uses the Glicko-2 Rating System and aims to pay homage to Aligulac from StarCraft 2, all players begin at 1500 and gain and lose points accordingly. The higher, the stronger the player.",
           'RD': "Rating Deviation, the system's measurement of certainty. The lower the deviation, the more stable.",
-          'Volatility': "Volatility is the measurement of how much a player's rating tends to swing, it begins at .06 at the beginning of the system and shifts over time.",
           'Rank': "Evogulac uses the system similar to ICcup and Fish from Brood War's Ladder clients, a taste for our upcoming Ladder system. You'll have to compete to see what leads to where!",
           'InactiveRisk': "Players will be marked as At Risk for inactivity after being inactive for 3 weeks, or roughly 3 tournament cycles."
         };
@@ -471,7 +513,7 @@ fetch(CSV_URL)
               <div class="tooltip-bubble">${tooltipMap[cleanHeader]}</div>
             </th>`;
           }
-          if (tooltipMap[cleanHeader]) {
+          if (tooltipMap[cleanHeader] && cleanHeader !== "Volatility") {
             return `<th><div class="tooltip">${cleanHeader}<div class="tooltip-bubble">${tooltipMap[cleanHeader]}</div></div></th>`;
           }
           return `<th>${cleanHeader}</th>`;
@@ -516,7 +558,12 @@ fetch(CSV_URL)
             /*return `<td style="${paddingStyle}">${cell}</td>`;*/
             if (headers[i].trim().toLowerCase() === "rating") return `<td style="opacity:0; ${paddingStyle}" data-rating="${cell}" data-col="rating" data-master-rating="true">0000</td>`;
             if (headers[i].trim().toLowerCase() === "rd") return `<td style="opacity:0; ${paddingStyle}" data-col="rd">${cell}</td>`;
-            if (headers[i].trim().toLowerCase() === "volatility") return `<td style="opacity:0; ${paddingStyle}" data-col="vol">${cell}</td>`;
+                        if (headers[i].trim().toLowerCase() === "rank") {
+              const rankValue = cell.toLowerCase();
+              return `<td data-col="rank" class="rank-icon-cell" style="opacity:0;">`
+                + `<img src="Assets/ranks/rank-${rankValue}.png" alt="Rank ${cell}" class="rank-icon" />`
+                + `</td>`;
+            }
             return `<td style="opacity:0; ${paddingStyle}" data-final="${cell}" data-col="${headers[i].trim().toLowerCase()}"></td>`;
           }).join('');
           tbody.appendChild(tr);
@@ -538,7 +585,7 @@ fetch(CSV_URL)
 
 
         
-          const colKeys = ['name', 'race', 'rating', 'rd', 'vol'];
+          const colKeys = ['name', 'race', 'rating', 'rd'];
           const allDelays = [];
           setTimeout(() => {
             colKeys.forEach((col, colIndex) => {

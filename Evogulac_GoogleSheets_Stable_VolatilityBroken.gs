@@ -1,3 +1,45 @@
+function updateVolatility(player, delta, v, tau = 0.3) {
+  const a = Math.log(player.volatility ** 2);
+  const eps = 0.000001;
+
+  // Convert RD to Glicko-2 scale
+  const RD = player.rd / 173.7178;
+
+  function f(x) {
+    const eX = Math.exp(x);
+    const num = eX * (delta ** 2 - RD ** 2 - v - eX);
+    const denom = 2 * (RD ** 2 + v + eX) ** 2;
+    return (num / denom) - ((x - a) / (tau ** 2));
+  }
+
+  let A = a;
+  let B;
+  if (delta ** 2 > RD ** 2 + v) {
+    B = Math.log(delta ** 2 - RD ** 2 - v);
+  } else {
+    let k = 1;
+    while (f(a - k * tau) < 0) {
+      k++;
+    }
+    B = a - k * tau;
+  }
+
+  let fA = f(A), fB = f(B);
+  while (Math.abs(B - A) > eps) {
+    const C = A + (A - B) * fA / (fB - fA);
+    const fC = f(C);
+    if (fC * fB < 0) {
+      A = B; fA = fB;
+    } else {
+      fA /= 2;
+    }
+    B = C; fB = fC;
+  }
+
+  return Math.exp(A / 2);
+}
+
+
 function onOpen() {
   const ui = SpreadsheetApp.getUi();
   ui.createMenu('Glicko2')
@@ -34,6 +76,8 @@ function editDistance(s1, s2) {
   return costs[s2.length];
 }
 
+// Main Update Ratings function
+
 function updateRatings() {
   const sheet = SpreadsheetApp.getActiveSpreadsheet();
   const matchSheet = sheet.getSheetByName('Matches');
@@ -61,13 +105,80 @@ function updateRatings() {
     };
   }).filter(row => row.a && row.b && row.result !== null && row.date)
     .sort((x, y) => x.date - y.date);
+    // Count number of games per player
+const gamesPlayedMap = new Map();
+for (const m of matches) {
+  let totalGames = 1; // default
+  if (m.result !== null && m.result > 0) {
+    totalGames = Math.round(1 / m.result) + 1;
+  }
+  // Edge case: result === 0 still means a series of at least 1 game
+  if (m.result === 0) {
+    totalGames = 1;
+  }
+  // Add game counts
+  gamesPlayedMap.set(m.a, (gamesPlayedMap.get(m.a) || 0) + totalGames);
+  gamesPlayedMap.set(m.b, (gamesPlayedMap.get(m.b) || 0) + totalGames);
+}
 
-  const allNames = Array.from(new Set(matches.flatMap(m => [m.a, m.b])));
+
+// DEBUG LOG HERE DATES
+
+/*
+Logger.log('3/13/2025');
+Logger.log(matches.map(m => m.date.toISOString()));
+  */
+  // Load last processed date for warnings
+  const settingsSheet = sheet.getSheetByName('Settings');
+  const lastProcessedValue = settingsSheet.getRange('B1').getValue();
+  const lastProcessedDate = lastProcessedValue instanceof Date ? lastProcessedValue : new Date('1970-01-01T00:00:00Z');
+
+  // Filter matches to only include new ones
+  const newMatches = matches.filter(m => m.date > lastProcessedDate);
+  const latestProcessedDate = newMatches.reduce((latest, m) => m.date > latest ? m.date : latest, lastProcessedDate);
+const allNames = Array.from(new Set(matches.flatMap(m => [m.a, m.b])));
+
+let warnings = [];  // moved here to ensure early declaration
+  // Settings sheet tracking for last warnings parse
+  if (!settingsSheet) throw new Error('Settings sheet is missing.');
+  const lastParsedWarningDateStr = settingsSheet.getRange('B1').getValue();
+  const lastParsedWarningDate = new Date(lastParsedWarningDateStr || 0);
+
   const playerInfoMap = new Map(
     infoSheet.getRange(2, 1, infoSheet.getLastRow() - 1, 2).getValues().map(([name, race]) => [name?.trim(), race])
   );
 
-  const warnings = [];
+  
+  const newWarnings = [];
+  for (let i = 0; i < matches.length; i++) {
+    const match = matches[i];
+    if (match.date <= lastParsedWarningDate) continue;
+    for (let j = i + 1; j < matches.length; j++) {
+      const other = matches[j];
+      if (other.date <= lastParsedWarningDate) continue;
+      const sim = stringSimilarity(match.a, other.a);
+      if (sim > 0.85 && sim < 1) {
+        newWarnings.push(`!!! Possible duplicate: "${match.a}" vs "${other.a}" (similarity: ${Math.round(sim * 100)}%)`);
+      }
+    }
+  }
+
+  let warningSheet = sheet.getSheetByName('Warnings');
+  if (!warningSheet) {
+    warningSheet = sheet.insertSheet('Warnings');
+  } else {
+    warningSheet.clear();
+  }
+  warningSheet.getRange(1, 1).setValue('Bad Name Warnings');
+  if (newWarnings.length > 0) {
+    newWarnings.forEach((w, i) => warningSheet.getRange(i + 2, 1).setValue(w));
+  } else {
+    warningSheet.getRange(2, 1).setValue(':D No possible duplicates found.');
+  }
+
+  // Update last parsed warning date
+  settingsSheet.getRange('B1').setValue(new Date());
+
   for (let i = 0; i < allNames.length; i++) {
     for (let j = i + 1; j < allNames.length; j++) {
       const sim = stringSimilarity(allNames[i], allNames[j]);
@@ -78,11 +189,18 @@ function updateRatings() {
   }
   if (warnings.length > 0) warnings.forEach(w => Logger.log(w));
 
-  let warningSheet = sheet.getSheetByName('Warnings');
   if (!warningSheet) {
     warningSheet = sheet.insertSheet('Warnings');
   } else {
     warningSheet.clear();
+
+if (!settingsSheet) throw new Error('Settings sheet not found.');
+
+const lastWarningDateStr = settingsSheet.getRange("B1").getValue();
+const lastWarningDate = lastWarningDateStr ? new Date(lastWarningDateStr) : new Date(0);
+
+let latestParsedMatchDate = lastWarningDate;
+
   }
   warningSheet.getRange(1, 1).setValue('Bad Name Warnings');
   if (warnings.length > 0) {
@@ -97,7 +215,7 @@ else debugSheet.clear();
 
 debugSheet.getRange(1, 1, 1, 5).setValues([['PlayerA', 'PlayerB', 'Result', 'Date String', 'Parsed Date Valid?']]);
 
-matches.forEach((m, i) => {
+newMatches.forEach((m, i) => {
   debugSheet.getRange(i + 2, 1, 1, 5).setValues([[
     m.a,
     m.b,
@@ -242,7 +360,17 @@ matches.forEach((m, i) => {
   const last30Days = new Date();
   last30Days.setDate(today.getDate() - 30);
   const recentPlayers = new Set(matches.filter(m => m.date >= last30Days).flatMap(m => [m.a, m.b]));
+/*
+// LOG HERE RECENT PLAYERS
+Logger.log('Recent player check:');
+recentPlayers.forEach(player => {
+  Logger.log(`Name: ${player}, Games: ${gamesPlayedMap.get(player)}`);
+});
 
+// LOG HERE SPECIFIC PLAYER
+const playerToCheck = "MaNa";  // Adjust casing and spelling as needed
+Logger.log(`Is "${playerToCheck}" recent? ${recentPlayers.has(playerToCheck)}`);
+*/
   let playerList = Array.from(ratingMap.entries()).map(([name, player]) => {
     const rating = Math.round(player.getRating());
     const race = playerInfoMap.get(name) || '?';
@@ -274,8 +402,25 @@ matches.forEach((m, i) => {
   });
 
   playerList.sort((a, b) => b[2] - a[2]);
+  /*// LOG  HERE PLAYER LIST
+  Logger.log('All players and their data:');
+Logger.log(playerList);
+/*
+//DEBUG LOG HERE recent LIST GAMES PLAYED
 
-  const recentList = playerList.filter(row => recentPlayers.has(row[0]));
+playerList.forEach(row => {
+  const [name, race, rating, rd, vol, rank, inactivity, games] = row;
+  const isRecent = recentPlayers.has(name);
+  Logger.log(`Checking ${name} => isRecent: ${isRecent}, RD: ${rd}, Games: ${games}`);
+}); 
+
+ /* const recentList = playerList.filter(row => {const name = row[0];
+ const gamesPlayed = matches.filter(m => m.a === name || m.b === name).length;
+  return recentPlayers.has(name) && gamesPlayed >= 5;
+});*/
+
+const recentList = playerList.filter(row => recentPlayers.has(row[0]) && gamesPlayedMap.get(row[0]) >= 5);
+
 
   ratingSheet.getRange(1, 1, 1, 7).setValues([
     ['Name', 'Race', 'Rating', 'RD', 'Volatility', 'Rank', 'InactiveRisk']
@@ -287,7 +432,13 @@ matches.forEach((m, i) => {
   ]);
   allRatingSheet.getRange(2, 1, playerList.length, 7).setValues(playerList);
 
-  syncPlayerRaces();
+  
+if (matches.length > 0) {
+  const newestMatchDate = matches[matches.length - 1].date;
+  settingsSheet.getRange("B1").setValue(newestMatchDate);
+}
+
+syncPlayerRaces();
 
   const existingInfo = infoSheet.getRange(2, 1, Math.max(infoSheet.getLastRow() - 1, 0), 1).getValues().flat().map(n => n.trim());
   const missing = allNames.filter(name => !existingInfo.includes(name));
@@ -345,65 +496,29 @@ function syncPlayerRaces() {
 }
 
 
-
 function onEdit(e) {
   const range = e.range;
   const sheet = range.getSheet();
 
   if (sheet.getName() !== 'Matches') return;
+
   const editedColumn = range.getColumn();
   const row = range.getRow();
 
-  // Column E is where score like "2-0" is entered
+  // Column E is for score format like "2-1"
   if (editedColumn === 5) {
     const scoreText = e.value;
     if (!scoreText || scoreText.trim() === '') return;
 
-    const scoreMatch = /^\s*(\d+)\s*-\s*(\d+)\s*$/i.exec(scoreText);
-    if (!scoreMatch) return;
+    const match = /^\s*(\d+)\s*-\s*(\d+)\s*$/.exec(scoreText);
+    if (!match) return;
 
-    const scoreA = parseInt(scoreMatch[1], 10);
-    const scoreB = parseInt(scoreMatch[2], 10);
-    const total = scoreA + scoreB;
-
+    const winsA = parseInt(match[1], 10);
+    const winsB = parseInt(match[2], 10);
+    const total = winsA + winsB;
     if (total === 0) return;
 
-    const result = scoreA / total;
-
-    // Always overwrite Column C (3) if E is non-blank and valid
-    const resultCell = sheet.getRange(row, 3);
-    resultCell.setValue(Math.round(result * 1000) / 1000); // round to 3 decimals
-  }
-}
-
-
-
-function onEdit(e) {
-  const range = e.range;
-  const sheet = range.getSheet();
-
-  if (sheet.getName() !== 'Matches') return;
-  const editedColumn = range.getColumn();
-  const row = range.getRow();
-
-  // Column E is where score like "2-0" is entered
-  if (editedColumn === 5) {
-    const scoreText = e.value;
-    if (!scoreText || scoreText.trim() === '') return;
-
-    const scoreMatch = /^\s*(\d+)\s*-\s*(\d+)\s*$/i.exec(scoreText);
-    if (!scoreMatch) return;
-
-    const scoreA = parseInt(scoreMatch[1], 10);
-    const scoreB = parseInt(scoreMatch[2], 10);
-    const total = scoreA + scoreB;
-
-    if (total === 0) return;
-
-    const result = scoreA / total;
-
-    // Always overwrite Column C (3) if E is non-blank and valid
-    const resultCell = sheet.getRange(row, 3);
-    resultCell.setValue(Math.round(result * 1000) / 1000); // round to 3 decimals
+    const result = winsA / total;
+    sheet.getRange(row, 3).setValue(Math.round(result * 1000) / 1000);  // Column C
   }
 }

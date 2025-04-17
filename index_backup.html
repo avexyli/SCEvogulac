@@ -39,7 +39,7 @@
     .table-wrapper {
       max-width: 875px;
       border-radius: 12px;
-      margin-left: 62.5px;
+      margin-left: 120px;
     }
 
     table {
@@ -340,6 +340,20 @@
       text-shadow: 0 0 8px #5dba95, 0 0 14px #5dba95;
     }
 
+
+    .rank-icon-cell {
+      border: none !important;
+      background: transparent !important;
+      box-shadow: none !important;
+      padding: 0;
+      text-align: center;
+    }
+
+    .rank-icon {
+      height: 34px;
+      vertical-align: middle;
+    }
+
 </style>
 </head>
 
@@ -348,7 +362,7 @@
   <div class="top-links fade-in-top">
     <a href="https://liquipedia.net/starcraft2/StarCraft_Evolution_League" target="_blank">StarCraft: EVO League: Code S</a>
     <a href="https://liquipedia.net/starcraft2/SEL_Code_A" target="_blank">StarCraft: EVO League: Code A</a>
-    <a href="https://teamkoprulu.github.io/Koprulu-Blog/" target="_blank">Patch notes & Blog</a>
+    <a href="https://teamkoprulu.github.io/Koprulu-Blog/" target="_blank">Blog and Patch Notes</a>
   </div>
 
 <div class="title-image fade-in-top">
@@ -546,6 +560,12 @@ fetch(CSV_URL)
             if (headers[i].trim().toLowerCase() === "rating") return `<td style="opacity:0; ${paddingStyle}" data-rating="${cell}" data-col="rating" data-master-rating="true">0000</td>`;
             if (headers[i].trim().toLowerCase() === "rd") return `<td style="opacity:0; ${paddingStyle}" data-col="rd">${cell}</td>`;
             if (headers[i].trim().toLowerCase() === "volatility") return `<td style="opacity:0; ${paddingStyle}" data-col="vol">${cell}</td>`;
+            if (headers[i].trim().toLowerCase() === "rank") {
+              const rankValue = cell.toLowerCase();
+              return `<td data-col="rank" class="rank-icon-cell" style="opacity:0;">`
+                + `<img src="Assets/ranks/rank-${rankValue}.png" alt="Rank ${cell}" class="rank-icon" />`
+                + `</td>`;
+            }
             return `<td style="opacity:0; ${paddingStyle}" data-final="${cell}" data-col="${headers[i].trim().toLowerCase()}"></td>`;
           }).join('');
           tbody.appendChild(tr);
